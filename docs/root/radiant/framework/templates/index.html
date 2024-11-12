@@ -1,0 +1,80 @@
+{% autoescape None %}
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{page_title}}</title>
+    <link rel="icon" type="image/x-icon" href="{{page_favicon}}">
+    <meta name="description" content="{{page_description}}">
+    <meta name="robots" content="index, follow">
+
+    <meta property="og:title" content="{{page_title}}">
+    <meta property="og:description" content="{{page_description}}">
+    <meta property="og:image" content="{{page_image}}">
+    <meta property="og:url" content="{{page_url}}">
+
+    <meta name="twitter:card" content="{{page_summary_large_image}}">
+    <meta name="twitter:site" content="{{page_site}}">
+    <meta name="twitter:title" content="{{page_title}}">
+    <meta name="twitter:description" content="{{page_description}}">
+    <meta name="twitter:image" content="{{page_image}}">
+
+    <link rel="canonical" href="{{page_url}}">
+
+    <meta name="author" content="{{page_author}}">
+    <meta name="copyright" content="{{page_copyright}}">
+
+    {% block html_head %}{% end %}
+
+    <!--Brython-->
+    <script type="text/javascript" src="{{domain}}/static/brython/Brython-{{brython_version}}/brython.js"></script>
+    <script type="text/javascript" src="{{domain}}/static/brython/Brython-{{brython_version}}/brython_stdlib.js"></script>
+    <brython-options debug="{{debug_level}}" cache="true"></brython-options>
+
+    <!--Default CSS-->
+    <link rel="stylesheet" type="text/css" href="{{domain}}/static/styles/normalize.css">
+    <link rel="stylesheet" type="text/css" href="{{domain}}/static/styles/default.css">
+    <link rel="stylesheet" type="text/css" href="{{domain}}/static/styles/bootstrap-grid.css">
+
+    <!--Fonts-->
+    <link type="text/css" rel="stylesheet" href="{{domain}}/static/fonts/roboto-android/roboto.css">
+    <link type="text/css" rel="stylesheet" href="{{domain}}/static/fonts/roboto-android/roboto-mono.css">
+
+    <style>
+    .RADIANT-HIDE {
+        display: none !important;
+    }
+    </style>
+
+    <script type="text/python">
+import sys
+from radiant.framework.utils import autoinit
+from {{file}} import {{class_}}
+
+
+{% if mock_imports %}
+from radiant.framework.utils import fake
+{% for module in mock_imports %}
+sys.modules["{{module}}"] = fake()
+{% end %}
+{% end %}
+
+{% block module_init %}
+module = {{class_}}{% if wrapped %}(**{{arguments}}){% end %}(None, {{python_}})
+{% end %}
+
+argvs = {{argv}}
+autoinit()
+
+    </script>
+
+    </head>
+    <body onload="brython({pythonpath: {{path}}})">
+        {% block html_body %}{% end %}
+    </body>
+
+    <div id="radiant-placeholder--templates" style="display: none;"></div>
+
+</html>
