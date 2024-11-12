@@ -5,6 +5,8 @@ from browser import timer
 from radiant.framework import WebComponents
 from browser.local_storage import storage
 
+domain = '/stylophone-assistant'
+# domain = ''
 
 sl = WebComponents('sl')
 
@@ -353,7 +355,7 @@ class StylophoneAssistant(RadiantCore):
 
         req = ajax.ajax()
         req.bind('complete', self.on_complete)
-        req.open('GET', f'/root/assets/stylophone_{gen}_{style}.svg', True)
+        req.open('GET', f'{domain}/root/assets/stylophone_{gen}_{style}.svg', True)
         req.send()
 
     # ----------------------------------------------------------------------
@@ -481,6 +483,6 @@ if __name__ == '__main__':
         template='template.html',
         static_app='docs',
         page_title="Stylophone Assistant",
-        domain='/stylophone-assistant',
+        domain=domain,
         # domain='',
     )
