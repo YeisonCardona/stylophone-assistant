@@ -1,0 +1,67 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stylophone Assistant</title>
+<link rel="icon" type="image/x-icon" href="">
+<meta name="description" content="">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Stylophone Assistant">
+<meta property="og:description" content="">
+<meta property="og:image" content="">
+<meta property="og:url" content="">
+<meta name="twitter:card" content="">
+<meta name="twitter:site" content="">
+<meta name="twitter:title" content="Stylophone Assistant">
+<meta name="twitter:description" content="">
+<meta name="twitter:image" content="">
+<link rel="canonical" href="">
+<meta name="author" content="">
+<meta name="copyright" content="">
+
+<!--Shoelace-->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.18.0/cdn/themes/light.css" />
+<script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.18.0/cdn/shoelace-autoloader.js"></script>
+<!--Fonts-->
+<link type="text/css" rel="stylesheet" href="/root/static/fonts/segou_ui_4/segoe.css">
+<style>
+.button-group-toolbar sl-button-group:not(:last-of-type) {
+margin-right: var(--sl-spacing-x-small);
+}
+</style>
+
+<!--Brython-->
+<script type="text/javascript" src="/static/brython/Brython-3.11.3/brython.js"></script>
+<script type="text/javascript" src="/static/brython/Brython-3.11.3/brython_stdlib.js"></script>
+<brython-options debug="0" cache="true"></brython-options>
+<!--Default CSS-->
+<link rel="stylesheet" type="text/css" href="/static/styles/normalize.css">
+<link rel="stylesheet" type="text/css" href="/static/styles/default.css">
+<link rel="stylesheet" type="text/css" href="/static/styles/bootstrap-grid.css">
+<!--Fonts-->
+<link type="text/css" rel="stylesheet" href="/static/fonts/roboto-android/roboto.css">
+<link type="text/css" rel="stylesheet" href="/static/fonts/roboto-android/roboto-mono.css">
+<style>
+.RADIANT-HIDE {
+display: none !important;
+}
+</style>
+<script type="text/python">
+import sys
+from radiant.framework.utils import autoinit
+from main import StylophoneAssistant
+
+
+module = StylophoneAssistant(None, ())
+
+argvs = ["/home/valentintina/Documents/Development/YeisonCardona/stylophone-assistant/main.py"]
+autoinit()
+</script>
+</head>
+<body onload="brython({pythonpath: ['/root/', '/static/modules/brython']})">
+
+</body>
+<div id="radiant-placeholder--templates" style="display: none;"></div>
+</html>
