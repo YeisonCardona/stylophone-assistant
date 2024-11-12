@@ -1,1 +1,0 @@
-# stylophone-assistant
