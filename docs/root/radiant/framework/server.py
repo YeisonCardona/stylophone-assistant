@@ -347,9 +347,9 @@ def make_app(
         app += [url(r'^/$', RadiantHandler, environ)]
 
     app += [
-        url(r'^/theme.css$', ThemeHandler),
+        url(rf'^{domain}/theme.css$', ThemeHandler),
         url(rf'^{domain}/root/(.*)', StaticFileHandler, {'path': sys.path[0]}),
-        url(r'^/environ.json$', JSONHandler, environ),
+        url(rf'^{domain}/environ.json$', JSONHandler, environ),
         # url(r'^/manifest.json$', ManifestHandler),
     ]
 
