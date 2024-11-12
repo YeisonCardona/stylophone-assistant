@@ -11,7 +11,7 @@ sl = WebComponents('sl')
 
 button_base = '#B3B3B3'
 button_active = '#87DEAA'
-
+max_tabs = 8
 
 equivalencia_notas = {
     # Notas de la 3ª octava (bajadas con -2)
@@ -132,7 +132,7 @@ class StylophoneAssistant(RadiantCore):
                     with html(sl.textarea(label="Tabs")).context(
                         col
                     ) as self.textarea_s1:
-                        self.textarea_s1.bind("sl-change", self.textarea_save)
+                        self.textarea_s1.bind("sl-input", self.textarea_save)
 
             with html.DIV(Class='row').context(container) as row:
 
@@ -171,25 +171,74 @@ class StylophoneAssistant(RadiantCore):
                                     button.bind("click", self.on_button_stop)
 
                 with html.DIV(Class='col-md-2').context(row) as col:
-                    with html(sl.select(pill=True, label="Delay", value="0.5")).context(
+                    with html(sl.select(pill=True, label="Delay", value="500")).context(
                         col
                     ) as self.select_delay:
                         for i in range(100, 5001, 100):
                             self.select_delay <= sl.option(
-                                f"{i / 1000 :.1f} s", value=f"{i / 1000 :.1f}"
+                                f"{i / 1000 :.1f} s", value=f"{i}"
                             )
                         self.select_delay.bind("sl-change", self.load_stylophone)
 
             with html.DIV(Class='row').context(container) as row:
 
-                with html.DIV(Class='col-md-4').context(row) as col:
+                with html.DIV(Class='col-md-8', style='display: flex;').context(
+                    row
+                ) as col:
+
+                    with html.DIV(Class='container').context(col) as sub_container:
+
+                        with html.DIV(Class='row').context(sub_container) as row:
+
+                            with html.DIV(
+                                Class='col-md-5',
+                                style='text-align: right;',
+                            ).context(row) as col:
+
+                                self.span_tabs_pre = html.SPAN(
+                                    '...',
+                                    Class='--sl-font-sans --sl-font-size-2x-large --sl-font-weight-light',
+                                    style='flex: none; letter-spacing: 5px;',
+                                )
+                                col <= self.span_tabs_pre
+
+                            with html.DIV(
+                                Class='col-md-2',
+                                style='text-align: center;',
+                            ).context(row) as col:
+
+                                self.span_tabs_current = html.SPAN(
+                                    '#',
+                                    Class='--sl-font-sans --sl-font-size-2x-large --sl-font-weight-light',
+                                    style=f'flex: none; color:{button_active}',
+                                )
+                                col <= self.span_tabs_current
+
+                            with html.DIV(
+                                Class='col-md-5',
+                                style='text-align: left;',
+                            ).context(row) as col:
+
+                                self.span_tabs_post = html.SPAN(
+                                    '...',
+                                    Class='--sl-font-sans --sl-font-size-2x-large --sl-font-weight-light',
+                                    style='flex: none; letter-spacing: 5px;',
+                                )
+                                col <= self.span_tabs_post
+
+            with html.DIV(Class='row').context(container) as row:
+
+                with html.DIV(Class='col-md-8').context(row) as col:
 
                     with html(
-                        sl.range(min="100", max="5000", step=100, value="1000")
-                    ).context(col) as self.range_delay:
-                        self.range_delay.tooltipFormatter = (
-                            lambda value: f"Delay {value / 1000:.1f} s"
+                        sl.range(
+                            min="0", max="100", step=1, value="0", tooltip="bottom"
                         )
+                    ).context(col) as self.range_progress:
+                        self.range_progress.tooltipFormatter = (
+                            lambda value: f"Tab {value + 1}"
+                        )
+                        self.range_progress.bind("sl-input", self.range_progress_change)
 
         try:
             self.textarea_s1.value = storage['tabs']
@@ -201,20 +250,82 @@ class StylophoneAssistant(RadiantCore):
     # ----------------------------------------------------------------------
     def textarea_save(self, event):
         """"""
+        print('XxX')
         storage['tabs'] = event.target.value
+
+        tabs = event.target.value
+        tabs = (
+            tabs.replace('\n', '')
+            .replace('-', ' ')
+            .replace(',', ' ')
+            .replace('(', ' (')
+            .replace(')', ') ')
+            .replace(' )', ') ')
+        )
+
+        self.span_tabs_pre.text = ''
+        self.span_tabs_current.text = ''
+        self.span_tabs_post.text = tabs
+
+        self.range_progress.min = 0
+        self.range_progress.max = len(tabs.split(' '))
+
+    # ----------------------------------------------------------------------
+    def range_progress_change(self, event):
+        """"""
+        self.counter_s1 = event.target.value
+        self.counter_x1 = event.target.value
+
+        self.s1_tabs = self.textarea_s1.value.split(' ')
+        self.x1_tabs = convertir_secuencia(self.textarea_s1.value).split(' ')
+
+        match self.select_gen.value:
+
+            case 's1':
+
+                tab = self.s1_tabs[self.counter_s1]
+
+                self.span_tabs_pre.text = ' '.join(
+                    self.s1_tabs[max(0, self.counter_s1 - max_tabs) : self.counter_s1]
+                )
+                self.span_tabs_current.text = f" {tab} "
+                self.span_tabs_post.text = ' '.join(
+                    self.s1_tabs[
+                        self.counter_s1
+                        + 1 : min(len(self.s1_tabs), self.counter_s1 + max_tabs)
+                    ]
+                )
+
+            case 'x1':
+                tab = self.x1_tabs[self.counter_x1]
+
+                self.span_tabs_pre.text = ' '.join(
+                    self.x1_tabs[max(0, self.counter_x1 - max_tabs) : self.counter_x1]
+                )
+                self.span_tabs_current.text = f" {tab} "
+                self.span_tabs_post.text = ' '.join(
+                    self.x1_tabs[
+                        self.counter_x1
+                        + 1 : min(len(self.x1_tabs), self.counter_x1 + max_tabs)
+                    ]
+                )
+
+            case 'both':
+                pass
 
     # ----------------------------------------------------------------------
     def on_button_start(self, event):
         self.stop = False
         # self.progress.value = 0
 
-        self.counter_s1 = 0
-        self.counter_x1 = 0
+        self.counter_s1 = self.range_progress.value
+        self.counter_x1 = self.range_progress.value
 
         self.s1_tabs = self.textarea_s1.value.split(' ')
         self.x1_tabs = convertir_secuencia(self.textarea_s1.value).split(' ')
 
-        print(self.x1_tabs)
+        # print(self.x1_tabs)
+        # print(self.select_delay.value)
 
         match self.select_gen.value:
 
@@ -284,9 +395,17 @@ class StylophoneAssistant(RadiantCore):
         except:
             return
 
-        self.counter_s1 += 1
-        # self.progress.value = 100 * self.counter_x1 / len(self.s1_tabs)
+        self.span_tabs_pre.text = ' '.join(
+            self.s1_tabs[max(0, self.counter_s1 - max_tabs) : self.counter_s1]
+        )
+        self.span_tabs_current.text = f" {tab} "
+        self.span_tabs_post.text = ' '.join(
+            self.s1_tabs[
+                self.counter_s1 + 1 : min(len(self.s1_tabs), self.counter_s1 + max_tabs)
+            ]
+        )
 
+        self.counter_s1 += 1
         if tab.replace('.', '').isdigit():
             svg_element = document[f"tab_s{tab.replace('.', '_')}"]
             svg_element.style.fill = button_active
@@ -308,23 +427,33 @@ class StylophoneAssistant(RadiantCore):
         """"""
 
         try:
-            tabx_ = self.x1_tabs[self.counter_x1]
+            tab = self.x1_tabs[self.counter_x1]
         except:
             return
+
+        self.span_tabs_pre.text = ' '.join(
+            self.x1_tabs[max(0, self.counter_x1 - max_tabs) : self.counter_x1]
+        )
+        self.span_tabs_current.text = f" {tab} "
+        self.span_tabs_post.text = ' '.join(
+            self.x1_tabs[
+                self.counter_x1 + 1 : min(len(self.x1_tabs), self.counter_x1 + max_tabs)
+            ]
+        )
 
         self.counter_x1 += 1
         # self.progress.value = 100 * self.counter_x1 / len(self.x1_tabs)
 
-        if tabx_.strip('()').replace('-2:', '').replace('.', '').isdigit():
+        if tab.strip('()').replace('-2:', '').replace('.', '').isdigit():
 
-            if '-2' in tabx_:
-                tabx_ = tabx_.strip('()').replace('-2:', '')
-                svg_element = document[f"tab_x{tabx_.replace('.', '_')}"]
+            if '-2' in tab:
+                tab = tab.strip('()').replace('-2:', '')
+                svg_element = document[f"tab_x{tab.replace('.', '_')}"]
                 document["tab_xm2"].style.fill = button_active
                 document["tab_xm1"].style.fill = button_base
             else:
-                tabx_ = tabx_.strip('()')
-                svg_element = document[f"tab_x{tabx_.replace('.', '_')}"]
+                tab = tab.strip('()')
+                svg_element = document[f"tab_x{tab.replace('.', '_')}"]
 
             svg_element.style.fill = button_active
 
@@ -332,7 +461,7 @@ class StylophoneAssistant(RadiantCore):
             return self.animate_x1()
 
         timer.set_timeout(
-            lambda: self.clear(f"tab_x{tabx_.replace('.', '_')}"),
+            lambda: self.clear(f"tab_x{tab.replace('.', '_')}"),
             float(self.select_delay.value) * 0.7,
         )
         timer.set_timeout(lambda: self.clear("tab_xm2"), float(self.select_delay.value))
@@ -350,6 +479,6 @@ if __name__ == '__main__':
     RadiantServer(
         'StylophoneAssistant',
         template='template.html',
-        # static_app=True,
+        static_app=True,
         page_title="Stylophone Assistant",
     )

@@ -479,6 +479,6 @@ if __name__ == '__main__':
     RadiantServer(
         'StylophoneAssistant',
         template='template.html',
-        # static_app=True,
+        static_app=True,
         page_title="Stylophone Assistant",
     )
