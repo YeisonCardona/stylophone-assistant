@@ -13,7 +13,7 @@ sl = WebComponents('sl')
 
 button_base = '#B3B3B3'
 button_active = 'var(--sl-color-primary-300)'
-max_tabs = 8
+max_tabs = 5
 
 equivalencia_notas = {
     # Notas de la 3ª octava (bajadas con -2)
