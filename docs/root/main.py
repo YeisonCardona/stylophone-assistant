@@ -149,7 +149,7 @@ class StylophoneAssistant(RadiantCore):
             with html.DIV(Class='row').context(container) as row:
 
                 with html.DIV(
-                    Class='col-md-5',
+                    Class='col-md-5 col-sm-5',
                     style='text-align: right; margin-top: 10px;',
                 ).context(row) as col:
 
@@ -161,7 +161,7 @@ class StylophoneAssistant(RadiantCore):
                     col <= self.span_tabs_pre
 
                 with html.DIV(
-                    Class='col-md-2',
+                    Class='col-md-2 col-sm-2',
                     style='text-align: center;',
                 ).context(row) as col:
 
@@ -173,7 +173,7 @@ class StylophoneAssistant(RadiantCore):
                     col <= self.span_tabs_current
 
                 with html.DIV(
-                    Class='col-md-5',
+                    Class='col-md-5 col-sm-5',
                     style='text-align: left; margin-top: 10px;',
                 ).context(row) as col:
 
