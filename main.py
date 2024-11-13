@@ -12,7 +12,7 @@ sl = WebComponents('sl')
 
 
 button_base = '#B3B3B3'
-button_active = '#87DEAA'
+button_active = 'var(--sl-color-primary-300)'
 max_tabs = 8
 
 equivalencia_notas = {
@@ -130,111 +130,102 @@ class StylophoneAssistant(RadiantCore):
 
             with html.DIV(Class='row').context(container) as row:
 
-                with html.DIV(Class='col-md-12').context(row) as col:
-                    with html(sl.textarea(label="Tabs")).context(
+                with html.DIV(Class='col-md-12', style='margin-top: 15px;').context(
+                    row
+                ) as col:
+                    with html(sl.textarea(label="Tabs", resize="auto")).context(
                         col
                     ) as self.textarea_s1:
                         self.textarea_s1.bind("sl-input", self.textarea_save)
 
             with html.DIV(Class='row').context(container) as row:
 
-                with html.DIV(Class='col-md-8').context(row) as col:
+                with html.DIV(Class='col-md-12', style='margin-top: 15px;').context(
+                    row
+                ) as col:
                     self.svg_container = html.DIV()
                     col <= self.svg_container
 
-                with html.DIV(Class='col-md-2').context(row) as col:
+            with html.DIV(Class='row').context(container) as row:
 
-                    with html.DIV(Class='button-group-toolbar').context(col) as toolbar:
+                with html.DIV(
+                    Class='col-md-5',
+                    style='text-align: right; margin-top: 10px;',
+                ).context(row) as col:
 
-                        with html(sl.button_group(label="group")).context(
-                            toolbar
-                        ) as group:
+                    self.span_tabs_pre = html.SPAN(
+                        '...',
+                        Class='--sl-font-sans',
+                        style='flex: none; letter-spacing: 5px;',
+                    )
+                    col <= self.span_tabs_pre
 
-                            with html(sl.tooltip(content="Play")).context(
-                                group
-                            ) as tooltip:
-                                with html(sl.button()).context(tooltip) as button:
-                                    button <= sl.icon(
-                                        name="play",
-                                        label="Play",
-                                        style="font-size: 2.5rem; display: flex;",
-                                    )
-                                    button.bind("click", self.on_button_start)
+                with html.DIV(
+                    Class='col-md-2',
+                    style='text-align: center;',
+                ).context(row) as col:
 
-                            with html(sl.tooltip(content="Stop")).context(
-                                group
-                            ) as tooltip:
-                                with html(sl.button()).context(tooltip) as button:
-                                    button <= sl.icon(
-                                        name="stop",
-                                        label="Stop",
-                                        style="font-size: 2.5rem; display: flex;",
-                                    )
-                                    button.bind("click", self.on_button_stop)
+                    self.span_tabs_current = html.SPAN(
+                        '#',
+                        Class='--sl-font-sans',
+                        style=f'flex: none; color: var(--sl-color-primary-600); font-size: 2rem;',
+                    )
+                    col <= self.span_tabs_current
 
-                with html.DIV(Class='col-md-2').context(row) as col:
-                    with html(sl.select(pill=True, label="Delay", value="500")).context(
+                with html.DIV(
+                    Class='col-md-5',
+                    style='text-align: left; margin-top: 10px;',
+                ).context(row) as col:
+
+                    self.span_tabs_post = html.SPAN(
+                        '...',
+                        Class='--sl-font-sans',
+                        style='flex: none; letter-spacing: 5px;',
+                    )
+                    col <= self.span_tabs_post
+
+            with html.DIV(Class='row', style='margin-top: 30px;').context(
+                container
+            ) as row:
+
+                with html.DIV(
+                    Class='col-md-1 col-sm-3', style="display: flex;"
+                ).context(row) as col:
+
+                    with html(
+                        sl.icon_button(name="play-circle", style="font-size: 2rem;")
+                    ).context(col) as button:
+                        button.bind("click", self.on_button_start)
+
+                    with html(
+                        sl.icon_button(name="stop-circle", style="font-size: 2rem;")
+                    ).context(col) as button:
+                        button.bind("click", self.on_button_stop)
+
+                with html.DIV(
+                    Class='col-md-2  col-sm-4', style="margin-top: 4px;"
+                ).context(row) as col:
+                    with html(sl.select(pill=True, value="500")).context(
                         col
                     ) as self.select_delay:
                         for i in range(100, 5001, 100):
                             self.select_delay <= sl.option(
-                                f"{i / 1000 :.1f} s", value=f"{i}"
+                                f"Delay: {i / 1000 :.1f} s", value=f"{i}"
                             )
                         self.select_delay.bind("sl-change", self.load_stylophone)
 
-            with html.DIV(Class='row').context(container) as row:
-
-                with html.DIV(Class='col-md-8', style='display: flex;').context(
-                    row
-                ) as col:
-
-                    with html.DIV(Class='container').context(col) as sub_container:
-
-                        with html.DIV(Class='row').context(sub_container) as row:
-
-                            with html.DIV(
-                                Class='col-md-5',
-                                style='text-align: right;',
-                            ).context(row) as col:
-
-                                self.span_tabs_pre = html.SPAN(
-                                    '...',
-                                    Class='--sl-font-sans --sl-font-size-2x-large --sl-font-weight-light',
-                                    style='flex: none; letter-spacing: 5px;',
-                                )
-                                col <= self.span_tabs_pre
-
-                            with html.DIV(
-                                Class='col-md-2',
-                                style='text-align: center;',
-                            ).context(row) as col:
-
-                                self.span_tabs_current = html.SPAN(
-                                    '#',
-                                    Class='--sl-font-sans --sl-font-size-2x-large --sl-font-weight-light',
-                                    style=f'flex: none; color:{button_active}',
-                                )
-                                col <= self.span_tabs_current
-
-                            with html.DIV(
-                                Class='col-md-5',
-                                style='text-align: left;',
-                            ).context(row) as col:
-
-                                self.span_tabs_post = html.SPAN(
-                                    '...',
-                                    Class='--sl-font-sans --sl-font-size-2x-large --sl-font-weight-light',
-                                    style='flex: none; letter-spacing: 5px;',
-                                )
-                                col <= self.span_tabs_post
-
-            with html.DIV(Class='row').context(container) as row:
-
-                with html.DIV(Class='col-md-8').context(row) as col:
+                with html.DIV(
+                    Class='col-md-8  col-sm-5', style="margin-top: 14px;"
+                ).context(row) as col:
 
                     with html(
                         sl.range(
-                            min="0", max="100", step=1, value="0", tooltip="bottom"
+                            min="0",
+                            max="100",
+                            step=1,
+                            value="0",
+                            tooltip="bottom",
+                            style="  --track-color-active: var(--sl-color-primary-600);  --track-color-inactive: var(--sl-color-primary-100);",
                         )
                     ).context(col) as self.range_progress:
                         self.range_progress.tooltipFormatter = (
@@ -244,6 +235,7 @@ class StylophoneAssistant(RadiantCore):
 
         try:
             self.textarea_s1.value = storage['tabs']
+            self.update_tabs_preview()
         except:
             pass
 
@@ -252,7 +244,6 @@ class StylophoneAssistant(RadiantCore):
     # ----------------------------------------------------------------------
     def textarea_save(self, event):
         """"""
-        print('XxX')
         storage['tabs'] = event.target.value
 
         tabs = event.target.value
@@ -265,9 +256,9 @@ class StylophoneAssistant(RadiantCore):
             .replace(' )', ') ')
         )
 
-        self.span_tabs_pre.text = ''
-        self.span_tabs_current.text = ''
-        self.span_tabs_post.text = tabs
+        self.counter_s1 = 0
+        self.counter_x1 = 0
+        self.update_tabs_preview()
 
         self.range_progress.min = 0
         self.range_progress.max = len(tabs.split(' '))
@@ -277,20 +268,22 @@ class StylophoneAssistant(RadiantCore):
         """"""
         self.counter_s1 = event.target.value
         self.counter_x1 = event.target.value
+        self.update_tabs_preview()
 
+    # ----------------------------------------------------------------------
+    def update_tabs_preview(self):
+        """"""
         self.s1_tabs = self.textarea_s1.value.split(' ')
         self.x1_tabs = convertir_secuencia(self.textarea_s1.value).split(' ')
 
         match self.select_gen.value:
 
             case 's1':
-
                 tab = self.s1_tabs[self.counter_s1]
-
                 self.span_tabs_pre.text = ' '.join(
                     self.s1_tabs[max(0, self.counter_s1 - max_tabs) : self.counter_s1]
                 )
-                self.span_tabs_current.text = f" {tab} "
+                self.span_tabs_current.text = f" {tab.strip('()')} "
                 self.span_tabs_post.text = ' '.join(
                     self.s1_tabs[
                         self.counter_s1
@@ -300,11 +293,10 @@ class StylophoneAssistant(RadiantCore):
 
             case 'x1':
                 tab = self.x1_tabs[self.counter_x1]
-
                 self.span_tabs_pre.text = ' '.join(
                     self.x1_tabs[max(0, self.counter_x1 - max_tabs) : self.counter_x1]
                 )
-                self.span_tabs_current.text = f" {tab} "
+                self.span_tabs_current.text = f" {tab.strip('()')} "
                 self.span_tabs_post.text = ' '.join(
                     self.x1_tabs[
                         self.counter_x1
@@ -408,6 +400,7 @@ class StylophoneAssistant(RadiantCore):
         )
 
         self.counter_s1 += 1
+        self.range_progress.value = self.counter_s1
         if tab.replace('.', '').isdigit():
             svg_element = document[f"tab_s{tab.replace('.', '_')}"]
             svg_element.style.fill = button_active
@@ -421,8 +414,8 @@ class StylophoneAssistant(RadiantCore):
 
         if not self.stop:
             timer.set_timeout(self.animate_s1, float(self.select_delay.value))
-        # else:
-        # self.progress.value = 0
+        else:
+            self.range_progress.value = 0
 
     # ----------------------------------------------------------------------
     def animate_x1(self):
@@ -444,7 +437,7 @@ class StylophoneAssistant(RadiantCore):
         )
 
         self.counter_x1 += 1
-        # self.progress.value = 100 * self.counter_x1 / len(self.x1_tabs)
+        self.range_progress.value = self.counter_x1
 
         if tab.strip('()').replace('-2:', '').replace('.', '').isdigit():
 
@@ -473,16 +466,16 @@ class StylophoneAssistant(RadiantCore):
 
         if not self.stop:
             timer.set_timeout(self.animate_x1, float(self.select_delay.value))
-        # else:
-        # self.progress.value = 0
+        else:
+            self.range_progress.value = 0
 
 
 if __name__ == '__main__':
     RadiantServer(
         'StylophoneAssistant',
         template='template.html',
-        static_app='docs',
         page_title="Stylophone Assistant",
         domain=domain,
+        # static_app='docs',
         # domain='',
     )

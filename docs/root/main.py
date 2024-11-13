@@ -5,8 +5,8 @@ from browser import timer
 from radiant.framework import WebComponents
 from browser.local_storage import storage
 
-domain = '/stylophone-assistant'
-# domain = ''
+# domain = '/stylophone-assistant'
+domain = None
 
 sl = WebComponents('sl')
 
