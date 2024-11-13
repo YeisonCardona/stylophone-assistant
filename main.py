@@ -476,6 +476,6 @@ if __name__ == '__main__':
         template='template.html',
         page_title="Stylophone Assistant",
         domain=domain,
-        # static_app='docs',
+        static_app='docs',
         # domain='',
     )
