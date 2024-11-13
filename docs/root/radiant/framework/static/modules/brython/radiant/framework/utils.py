@@ -16,7 +16,10 @@ class Environ_:
     # ----------------------------------------------------------------------
     def __init__(self):
         """"""
-        self.environ = json.load(open('/environ.json'))
+        try:
+            self.environ = json.load(open('/stylophone-assistant/environ.json'))
+        except:
+            self.environ = json.load(open('/environ.json'))
 
     # ----------------------------------------------------------------------
     def __call__(self, value, default=None):
