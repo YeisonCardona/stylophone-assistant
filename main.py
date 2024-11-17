@@ -4,45 +4,103 @@ from browser import document, svg, ajax
 from browser import timer
 from radiant.framework import WebComponents
 from browser.local_storage import storage
+import re
+
 
 domain = '/stylophone-assistant'
 # domain = ''
 
 sl = WebComponents('sl')
 
-
 button_base = '#B3B3B3'
 button_active = 'var(--sl-color-primary-300)'
 max_tabs = 5
 
+ignore_chars = ',-–—()'
+
+default_tabs = """
+# Super Mario for Gen X-1
+
+9 9 9 7 9 11 4
+(7 4.5 3 5 6.5 6 5 4 9 11 12 10 11 9 7 8 6.5 ) x2
+
+7
+11 10.5 10 8.5 9  5 7 5 7 8
+11 10.5 10 8.5 9  14 14 14  # For Generation S-1, tab 14 corresponds to tab 7 one octave higher.
+11 10.5 10 8.5 9  5 7 5 7 8 8.5 8
+
+7
+7 7 7 7 8 9 7 5 4
+7 7 7 7 8 9
+7 7 7 7 8 9 7 5 4
+
+9 9 9 7 9 11 4
+(7 4.5 3 5 6.5 6 5 4 9 11 12 10 11 9 7 8 6.5 ) x2
+"""
+
 equivalencia_notas = {
-    # Notas de la 3ª octava (bajadas con -2)
-    1: ("8", "-2"),
-    1.5: ("8.5", "-2"),
-    2: ("9", "-2"),
-    # Notas de la 4ª octava (sin cambios, -1)
-    3: ("3", "-1"),
-    3.5: ("3.5", "-1"),
-    4: ("4", "-1"),
-    4.5: ("4.5", "-1"),
-    5: ("5", "-1"),
-    6: ("6", "-1"),
-    6.5: ("6.5", "-1"),
-    7: ("7", "-1"),
-    7.5: ("7.5", "-1"),
-    8: ("8", "-1"),
-    8.5: ("8.5", "-1"),
-    9: ("9", "-1"),
-    # Notas de la 5ª octava (sin cambios, -1)
-    10: ("10", "-1"),
-    10.5: ("10.5", "-1"),
-    11: ("11", "-1"),
-    11.5: ("11.5", "-1"),
-    12: ("12", "-1"),
+    # Notas de la 3ª octava
+    1: ("8", "-1"),
+    1.5: ("8.5", "-1"),
+    2: ("9", "-1"),
+    # Notas de la 4ª octava
+    3: ("3", "0"),
+    3.5: ("3.5", "0"),
+    4: ("4", "0"),
+    4.5: ("4.5", "0"),
+    5: ("5", "0"),
+    6: ("6", "0"),
+    6.5: ("6.5", "0"),
+    7: ("7", "0"),
+    7.5: ("7.5", "0"),
+    8: ("8", "0"),
+    8.5: ("8.5", "0"),
+    9: ("9", "0"),
+    # Notas de la 5ª octava
+    10: ("10", "0"),
+    10.5: ("10.5", "0"),
+    11: ("11", "0"),
+    11.5: ("11.5", "0"),
+    12: ("12", "0"),
+    # Notas de la 5ª octava que no están en la S1
+    13: ("13", "0"),
+    13.5: ("13.5", "0"),
+    14: ("14", "0"),
+    14.5: ("14.5", "0"),
+    15: ("15", "0"),
+    15.5: ("15.5", "0"),
+    16: ("16", "0"),
 }
 
 
-def convertir_secuencia(secuencia):
+equivalencia_notas_1 = {
+    # Notas de la 3ª octava
+    1: ("1", "0"),
+    1.5: ("1.5", "0"),
+    2: ("2", "0"),
+    # Notas de la 4ª octava
+    3: ("3", "0"),
+    3.5: ("3.5", "0"),
+    4: ("4", "0"),
+    4.5: ("4.5", "0"),
+    5: ("5", "0"),
+    6: ("6", "0"),
+    6.5: ("6.5", "0"),
+    7: ("7", "0"),
+    7.5: ("7.5", "0"),
+    8: ("8", "0"),
+    8.5: ("8.5", "0"),
+    9: ("9", "0"),
+    # Notas de la 5ª octava
+    10: ("3", "-1"),
+    10.5: ("3.5", "-1"),
+    11: ("4", "-1"),
+    11.5: ("4.5", "-1"),
+    12: ("5", "-1"),
+}
+
+
+def convertir_secuencia(secuencia, equivalencia):
     """"""
     notas = []
     for nota in secuencia.split():
@@ -73,9 +131,9 @@ def convertir_secuencia(secuencia):
     secuencia_convertida = []
 
     for nota in notas:
-        if nota in equivalencia_notas:
-            genx1_pos, octava = equivalencia_notas[nota]
-            if octava == '-1':
+        if nota in equivalencia:
+            genx1_pos, octava = equivalencia[nota]
+            if octava == '0':
                 secuencia_convertida.append(f"{genx1_pos}")
             else:
                 secuencia_convertida.append(f"({octava}:{genx1_pos})")
@@ -89,6 +147,37 @@ def convertir_secuencia(secuencia):
     return secuencia_convertida
 
 
+def descomprimir_texto(texto):
+    """
+    Descomprime líneas que contienen patrones como '(contenido)x2' o '(contenido) x2'
+    replicando la línea anterior.
+
+    Args:
+        texto (str): El texto de entrada con posibles patrones '(...)xN'.
+
+    Returns:
+        str: El texto con los patrones descomprimidos.
+    """
+    lineas = texto.split("\n")
+    resultado = []
+
+    for linea in lineas:
+        # Verificar si hay un patrón de repetición (xN) con o sin espacio
+        match = re.search(r'\((.*?)\)\s*x(\d+)', linea)
+        if match:
+            # Extraer la línea dentro del paréntesis y el número de repeticiones
+            contenido = match.group(1).strip()
+            repeticiones = int(match.group(2))
+
+            # Agregar la línea descomprimida al resultado
+            resultado.extend([contenido] * repeticiones)
+        else:
+            # Si no hay patrón de repetición, agregar la línea tal cual
+            resultado.append(linea)
+
+    return "\n".join(resultado)
+
+
 ########################################################################
 class StylophoneAssistant(RadiantCore):
 
@@ -98,6 +187,7 @@ class StylophoneAssistant(RadiantCore):
     def __init__(self, *args, **kwargs):
         """"""
         super().__init__(*args, **kwargs)
+        self.loaded = False
 
         with html.DIV(Class='container').context(self.body) as container:
 
@@ -139,6 +229,13 @@ class StylophoneAssistant(RadiantCore):
                         self.textarea_s1.bind("sl-input", self.textarea_save)
 
             with html.DIV(Class='row').context(container) as row:
+
+                with html.DIV(Class='col-md-12', style='margin-top: 15px;').context(
+                    row
+                ) as col:
+                    self.switch_x1_8va = sl.switch("Gen X-1 -1 Octave")
+                    col <= self.switch_x1_8va
+                    self.switch_x1_8va.bind("sl-input", self.load_stylophone)
 
                 with html.DIV(Class='col-md-12', style='margin-top: 15px;').context(
                     row
@@ -233,35 +330,63 @@ class StylophoneAssistant(RadiantCore):
                         )
                         self.range_progress.bind("sl-input", self.range_progress_change)
 
-        try:
-            self.textarea_s1.value = storage['tabs']
-            self.update_tabs_preview()
-        except:
-            pass
+        timer.set_timeout(self.set_loaded, 500)
 
-        self.load_stylophone(gen='x1', style='tabs')
+    # ----------------------------------------------------------------------
+    def set_loaded(self):
+        """"""
+        self.loaded = True
+        self.counter_s1 = 0
+        self.counter_x1 = 0
+
+        self.textarea_s1.value = storage.get('tabs', default_tabs)
+        self.update_tabs_preview()
+
+        self.load_stylophone(gen='x1', style='tabs', x1_8va='')
+
+    # ----------------------------------------------------------------------
+    @property
+    def normalized_tabs(self):
+        """"""
+        tabs = self.textarea_s1.value
+        tabs = descomprimir_texto(tabs)
+
+        tabs_decomented = []
+        for line in tabs.split('\n'):
+            if '#' in line:
+                tabs_decomented.append(line[: line.find('#')])
+            else:
+                tabs_decomented.append(line)
+
+        tabs = ' \n '.join(tabs_decomented)
+        for char in ignore_chars:
+            tabs = tabs.replace(char, '')
+        return ' '.join(tabs.split())
+
+    # ----------------------------------------------------------------------
+    @property
+    def tabla_equivalencias(self):
+        """"""
+        if self.switch_x1_8va.checked:
+            return equivalencia_notas_1
+        else:
+            return equivalencia_notas
 
     # ----------------------------------------------------------------------
     def textarea_save(self, event):
         """"""
         storage['tabs'] = event.target.value
 
-        tabs = event.target.value
-        tabs = (
-            tabs.replace('\n', '')
-            .replace('-', ' ')
-            .replace(',', ' ')
-            .replace('(', ' (')
-            .replace(')', ') ')
-            .replace(' )', ') ')
-        )
-
         self.counter_s1 = 0
         self.counter_x1 = 0
         self.update_tabs_preview()
 
         self.range_progress.min = 0
-        self.range_progress.max = len(tabs.split(' '))
+        self.range_progress.max = len(self.normalized_tabs.split(' '))
+
+        print("Normalized tabs:", self.normalized_tabs)
+        print('S-1 tabs:', ' '.join(self.s1_tabs))
+        print('X-1 tabs:', ' '.join(self.x1_tabs))
 
     # ----------------------------------------------------------------------
     def range_progress_change(self, event):
@@ -273,53 +398,45 @@ class StylophoneAssistant(RadiantCore):
     # ----------------------------------------------------------------------
     def update_tabs_preview(self):
         """"""
-        self.s1_tabs = self.textarea_s1.value.split(' ')
-        self.x1_tabs = convertir_secuencia(self.textarea_s1.value).split(' ')
+        self.s1_tabs = self.normalized_tabs.split(' ')
+        self.x1_tabs = convertir_secuencia(
+            self.normalized_tabs, self.tabla_equivalencias
+        ).split(' ')
 
-        match self.select_gen.value:
+        if self.select_gen.value == 's1':
+            tab = self.s1_tabs[self.counter_s1]
+            self.span_tabs_pre.text = ' '.join(
+                self.s1_tabs[max(0, self.counter_s1 - max_tabs) : self.counter_s1]
+            )
+            self.span_tabs_current.text = f" {tab.strip('()')} "
+            self.span_tabs_post.text = ' '.join(
+                self.s1_tabs[
+                    self.counter_s1
+                    + 1 : min(len(self.s1_tabs), self.counter_s1 + max_tabs)
+                ]
+            )
 
-            case 's1':
-                tab = self.s1_tabs[self.counter_s1]
-                self.span_tabs_pre.text = ' '.join(
-                    self.s1_tabs[max(0, self.counter_s1 - max_tabs) : self.counter_s1]
-                )
-                self.span_tabs_current.text = f" {tab.strip('()')} "
-                self.span_tabs_post.text = ' '.join(
-                    self.s1_tabs[
-                        self.counter_s1
-                        + 1 : min(len(self.s1_tabs), self.counter_s1 + max_tabs)
-                    ]
-                )
-
-            case 'x1':
-                tab = self.x1_tabs[self.counter_x1]
-                self.span_tabs_pre.text = ' '.join(
-                    self.x1_tabs[max(0, self.counter_x1 - max_tabs) : self.counter_x1]
-                )
-                self.span_tabs_current.text = f" {tab.strip('()')} "
-                self.span_tabs_post.text = ' '.join(
-                    self.x1_tabs[
-                        self.counter_x1
-                        + 1 : min(len(self.x1_tabs), self.counter_x1 + max_tabs)
-                    ]
-                )
-
-            case 'both':
-                pass
+        elif self.select_gen.value in ['both', 'x1']:
+            tab = self.x1_tabs[self.counter_x1]
+            self.span_tabs_pre.text = ' '.join(
+                self.x1_tabs[max(0, self.counter_x1 - max_tabs) : self.counter_x1]
+            )
+            self.span_tabs_current.text = f" {tab.strip('()')} "
+            self.span_tabs_post.text = ' '.join(
+                self.x1_tabs[
+                    self.counter_x1
+                    + 1 : min(len(self.x1_tabs), self.counter_x1 + max_tabs)
+                ]
+            )
 
     # ----------------------------------------------------------------------
     def on_button_start(self, event):
         self.stop = False
-        # self.progress.value = 0
 
         self.counter_s1 = self.range_progress.value
         self.counter_x1 = self.range_progress.value
 
-        self.s1_tabs = self.textarea_s1.value.split(' ')
-        self.x1_tabs = convertir_secuencia(self.textarea_s1.value).split(' ')
-
-        # print(self.x1_tabs)
-        # print(self.select_delay.value)
+        self.update_tabs_preview()
 
         match self.select_gen.value:
 
@@ -336,18 +453,26 @@ class StylophoneAssistant(RadiantCore):
     # ----------------------------------------------------------------------
     def on_button_stop(self, event):
         self.stop = True
-        # self.progress.value = 0
 
     # ----------------------------------------------------------------------
-    def load_stylophone(self, event=None, gen=None, style=None):
+    def load_stylophone(self, event=None, gen=None, style=None, x1_8va=None):
         """"""
+        if not self.loaded:
+            return
+
         if event:
             gen = self.select_gen.value
             style = self.select_style.value
+            x1_8va = '-1' if self.switch_x1_8va.checked else ''
+
+        if gen == 's1':
+            x1_8va = ''
 
         req = ajax.ajax()
         req.bind('complete', self.on_complete)
-        req.open('GET', f'{domain}/root/assets/stylophone_{gen}_{style}.svg', True)
+        req.open(
+            'GET', f'{domain}/root/assets/stylophone_{gen}_{style}{x1_8va}.svg', True
+        )
         req.send()
 
     # ----------------------------------------------------------------------
@@ -363,13 +488,15 @@ class StylophoneAssistant(RadiantCore):
             svg_element.setAttribute("preserveAspectRatio", "xMidYMid meet")
 
             try:
-                document["tab_xm1"].style.fill = button_active
-            except:
-                pass
-            try:
                 document["tab_sm2"].style.fill = button_active
             except:
                 pass
+
+            if self.switch_x1_8va.checked:
+                try:
+                    document["tab_xm1"].style.fill = button_active
+                except:
+                    pass
 
     # ----------------------------------------------------------------------
     def clear(self, tab):
@@ -389,18 +516,10 @@ class StylophoneAssistant(RadiantCore):
         except:
             return
 
-        self.span_tabs_pre.text = ' '.join(
-            self.s1_tabs[max(0, self.counter_s1 - max_tabs) : self.counter_s1]
-        )
-        self.span_tabs_current.text = f" {tab} "
-        self.span_tabs_post.text = ' '.join(
-            self.s1_tabs[
-                self.counter_s1 + 1 : min(len(self.s1_tabs), self.counter_s1 + max_tabs)
-            ]
-        )
-
+        self.update_tabs_preview()
         self.counter_s1 += 1
         self.range_progress.value = self.counter_s1
+
         if tab.replace('.', '').isdigit():
             svg_element = document[f"tab_s{tab.replace('.', '_')}"]
             svg_element.style.fill = button_active
@@ -420,32 +539,24 @@ class StylophoneAssistant(RadiantCore):
     # ----------------------------------------------------------------------
     def animate_x1(self):
         """"""
-
         try:
             tab = self.x1_tabs[self.counter_x1]
         except:
             return
 
-        self.span_tabs_pre.text = ' '.join(
-            self.x1_tabs[max(0, self.counter_x1 - max_tabs) : self.counter_x1]
-        )
-        self.span_tabs_current.text = f" {tab} "
-        self.span_tabs_post.text = ' '.join(
-            self.x1_tabs[
-                self.counter_x1 + 1 : min(len(self.x1_tabs), self.counter_x1 + max_tabs)
-            ]
-        )
+        if self.select_gen.value == 'x1':
+            self.update_tabs_preview()
+            self.counter_x1 += 1
+            self.range_progress.value = self.counter_x1
+        else:
+            self.counter_x1 += 1
 
-        self.counter_x1 += 1
-        self.range_progress.value = self.counter_x1
+        if tab.strip('()').replace('-1:', '').replace('.', '').isdigit():
 
-        if tab.strip('()').replace('-2:', '').replace('.', '').isdigit():
-
-            if '-2' in tab:
-                tab = tab.strip('()').replace('-2:', '')
+            if '-1' in tab:
+                tab = tab.strip('()').replace('-1:', '')
                 svg_element = document[f"tab_x{tab.replace('.', '_')}"]
-                document["tab_xm2"].style.fill = button_active
-                document["tab_xm1"].style.fill = button_base
+                document["tab_xm1"].style.fill = button_active
             else:
                 tab = tab.strip('()')
                 svg_element = document[f"tab_x{tab.replace('.', '_')}"]
@@ -459,10 +570,11 @@ class StylophoneAssistant(RadiantCore):
             lambda: self.clear(f"tab_x{tab.replace('.', '_')}"),
             float(self.select_delay.value) * 0.7,
         )
-        timer.set_timeout(lambda: self.clear("tab_xm2"), float(self.select_delay.value))
-        timer.set_timeout(
-            lambda: self.active("tab_xm1"), float(self.select_delay.value)
-        )
+
+        if not self.switch_x1_8va.checked:
+            timer.set_timeout(
+                lambda: self.clear("tab_xm1"), float(self.select_delay.value)
+            )
 
         if not self.stop:
             timer.set_timeout(self.animate_x1, float(self.select_delay.value))
