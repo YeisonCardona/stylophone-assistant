@@ -18,24 +18,8 @@ header_text = """
 <strong>Stylophone Assistant</strong> is your go-to platform for enhancing your <strong>Stylophone</strong> practice. This tool allows you to input <strong>tabs</strong> for your favorite melodies and generates a dynamic <strong>animation</strong> compatible with both the <strong>S-1</strong> and <strong>Gen X-1</strong> models. Whether you're a <strong>beginner</strong> or an <strong>experienced player</strong>, the interactive interface helps you <strong>visualize</strong> and follow along with ease. Practice at your own pace, toggle <strong>octaves</strong>, and refine your <strong>skills</strong> while having fun with your <strong>Stylophone</strong>.
 """
 
-default_tabs = """# Super Mario for Gen X-1
-# For Generation S-1, tab 14 corresponds to tab 7 one octave higher.
+default_tabs = """# Write tabs here
 
-9 9 9 7 9 11 4
-(7 4.5 3 5 6.5 6 5 4 9 11 12 10 11 9 7 8 6.5) x2
-
-7
-11 10.5 10 8.5 9  5 7 5 7 8
-11 10.5 10 8.5 9  14 14 14
-11 10.5 10 8.5 9  5 7 5 7 8 8.5 8
-
-7
-7 7 7 7 8 9  7 5 4
-7 7 7 7 8 9
-7 7 7 7 8 9  7 5 4
-
-9 9 9 7 9 11 4
-(7 4.5 3 5 6.5 6 5 4 9 11 12 10 11 9 7 8 6.5) x2
 """
 
 equivalencia_notas = {
@@ -147,6 +131,23 @@ def convertir_secuencia(secuencia, equivalencia):
     return secuencia_convertida
 
 
+# ----------------------------------------------------------------------
+def load_tabs():
+    """"""
+    import os
+    import json
+
+    files = os.listdir('tabs')
+
+    tabs = {}
+    for filename in filter(lambda f: f.endswith('.txt'), files):
+        with open(os.path.join('tabs', filename), 'r') as file:
+            tabs[filename] = file.read()
+
+    with open('tabs/tabs.json', 'w') as file:
+        json.dump(tabs, file)
+
+
 def descomprimir_texto(texto):
     """
     Descomprime líneas que contienen patrones como '(contenido)x2' o '(contenido) x2'
@@ -229,11 +230,25 @@ class StylophoneAssistant(RadiantCore):
 
             with html.DIV(Class='row').context(container) as row:
 
+                with html.DIV(Class='col-md-4').context(row) as col:
+                    with html(
+                        sl.select(
+                            pill=True,
+                            label="Load tabs",
+                            value="custom",
+                            style="margin-top: 15px;",
+                        )
+                    ).context(col) as self.select_tab:
+                        self.select_tab <= sl.option("Custom", value='custom')
+                        self.select_tab.bind("sl-change", self.load_tab_in_textarea)
+
+            with html.DIV(Class='row').context(container) as row:
+
                 with html.DIV(Class='col-md-12', style='margin-top: 15px;').context(
                     row
                 ) as col:
                     with html(
-                        sl.textarea(label="Tabs", resize="auto", Class='textareaa')
+                        sl.textarea(label="Tabs", resize="auto", spellcheck="false")
                     ).context(col) as self.textarea_s1:
                         self.textarea_s1.bind("sl-input", self.textarea_save)
                     col <= html.HR()
@@ -353,6 +368,7 @@ class StylophoneAssistant(RadiantCore):
         self.update_tabs_preview()
 
         self.load_stylophone(gen='x1', style='tabs', x1_8va='')
+        self.load_tabs()
 
     # ----------------------------------------------------------------------
     @property
@@ -383,9 +399,10 @@ class StylophoneAssistant(RadiantCore):
             return equivalencia_notas
 
     # ----------------------------------------------------------------------
-    def textarea_save(self, event):
+    def textarea_save(self, event=None):
         """"""
-        storage['tabs'] = event.target.value
+        if self.select_tab.value == 'custom':
+            storage['tabs'] = self.textarea_s1.value
 
         self.counter_s1 = 0
         self.counter_x1 = 0
@@ -479,14 +496,14 @@ class StylophoneAssistant(RadiantCore):
             x1_8va = ''
 
         req = ajax.ajax()
-        req.bind('complete', self.on_complete)
+        req.bind('complete', self.on_complete_load_stylophone)
         req.open(
             'GET', f'{domain}/root/assets/stylophone_{gen}_{style}{x1_8va}.svg', True
         )
         req.send()
 
     # ----------------------------------------------------------------------
-    def on_complete(self, req):
+    def on_complete_load_stylophone(self, req):
         """"""
         if req.status == 200:
 
@@ -507,6 +524,42 @@ class StylophoneAssistant(RadiantCore):
                     document["tab_xm1"].style.fill = button_active
                 except:
                     pass
+
+            self.textarea_save()
+
+    # ----------------------------------------------------------------------
+    def load_tabs(self):
+        """"""
+        req = ajax.ajax()
+        req.bind('complete', self.on_complete_load_tabs)
+        req.open('GET', f'{domain}/root/tabs/tabs.json', True)
+        req.send()
+
+    # ----------------------------------------------------------------------
+    def on_complete_load_tabs(self, req):
+        """"""
+        if req.status == 200:
+            tabs = req.json
+
+            for i, tab in enumerate(tabs):
+                option = sl.option(
+                    tab.replace('.txt', ''),
+                    value=f'tab-{i}',
+                    id=f'id-tab-{i}',
+                )
+                option.attrs['tabs'] = tabs[tab]
+                self.select_tab <= option
+
+    # ----------------------------------------------------------------------
+    def load_tab_in_textarea(self, event):
+        """"""
+        tab = event.target.value
+        if tab == 'custom':
+            self.textarea_s1.value = storage.get('tabs', default_tabs)
+        else:
+            option = document[f'id-{tab}']
+            self.textarea_s1.value = option.attrs['tabs']
+        self.textarea_save()
 
     # ----------------------------------------------------------------------
     def clear(self, tab):
@@ -593,6 +646,8 @@ class StylophoneAssistant(RadiantCore):
 
 
 if __name__ == '__main__':
+    load_tabs()
+
     RadiantServer(
         'StylophoneAssistant',
         host='0.0.0.0',
