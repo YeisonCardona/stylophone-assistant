@@ -11,7 +11,7 @@ sl = WebComponents('sl')
 button_base = '#B3B3B3'
 button_active = '#c2733e'
 max_tabs = 5
-ignore_chars = ',-–—()'
+ignore_chars = ',-–—()<>'
 domain = '/stylophone-assistant'
 
 header_text = """
@@ -386,7 +386,7 @@ class StylophoneAssistant(RadiantCore):
 
         tabs = ' \n '.join(tabs_decomented)
         for char in ignore_chars:
-            tabs = tabs.replace(char, '')
+            tabs = tabs.replace(char, ' ')
         return ' '.join(tabs.split())
 
     # ----------------------------------------------------------------------
@@ -409,7 +409,7 @@ class StylophoneAssistant(RadiantCore):
         self.update_tabs_preview()
 
         self.range_progress.min = 0
-        self.range_progress.max = len(self.normalized_tabs.split(' '))
+        self.range_progress.max = len(self.normalized_tabs.split(' ')) - 1
 
         print("Normalized tabs:", self.normalized_tabs)
         print('S-1 tabs:', ' '.join(self.s1_tabs))
