@@ -7,13 +7,113 @@
     <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.18.0/cdn/shoelace-autoloader.js"></script>
 
     <!--Fonts-->
-    <link type="text/css" rel="stylesheet" href="{{domain}}/root/static/fonts/segou_ui_4/segoe.css">
+    <!--<link type="text/css" rel="stylesheet" href="{{domain}}/root/static/fonts/segou_ui_4/segoe.css">-->
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
 
     <style>
 
-      .button-group-toolbar sl-button-group:not(:last-of-type) {
-        margin-right: var(--sl-spacing-x-small);
+
+
+    .button-group-toolbar sl-button-group:not(:last-of-type) {
+      margin-right: var(--sl-spacing-x-small);
       }
+
+      .text-top {
+    text-align: center;
+      }
+
+    .page-header {
+      font-family: "Playfair Display", serif;
+    }
+
+
+    sl-textarea::part(base) {
+      font-family: monospace;
+      font-size: 1em !important;
+    }
+
+    .page-title {
+    font-size: 3rem;
+    text-align: center;
+    }
+
+
+    hr {
+    margin: 29px 0;
+    border: 1px solid #977b69;
+    }
+
+
+
+        body {
+          background-color: #EBDAC6;
+          color: #56321F;
+          font-family: 'Cinzel', serif;
+          padding-bottom:30px;
+        }
+
+
+
+      :root {
+
+        --sl-input-background-color: #F4EED8;
+        --sl-input-border-color: #56321F;
+
+
+        --sl-input-border-color-hover: var(--sl-input-border-color);
+        --sl-input-border-color-focus: var(--sl-input-border-color);
+        --sl-input-border-color-disabled: var(--sl-input-border-color);
+
+        --sl-input-focus-ring-color: #56321F2b;
+
+        --sl-panel-background-color: #F4EED8;
+        --sl-panel-border-color: #56321F;
+
+        --sl-color-primary-100: #F4EED8;
+        --sl-color-primary-500: #ab7755;
+        --sl-color-primary-600: #56321F;
+
+        --sl-color-neutral-0: #f4eed8;
+        --sl-color-neutral-100: #f4e7b1;
+        --sl-color-neutral-400: #977b69;
+
+
+        --sl-input-color: #56321F;
+
+
+
+      }
+
+      .icon-button-color sl-icon-button::part(base) {
+        color: #56321F;
+      }
+
+      .icon-button-color sl-icon-button::part(base):hover,
+      .icon-button-color sl-icon-button::part(base):focus {
+        color: #ab7755;
+      }
+
+      .icon-button-color sl-icon-button::part(base):active {
+        color: #977b69;
+      }
+
+
+    .tabs-line {
+      font-family: monospace;
+      <!--text-wrap-mode: nowrap;-->
+      white-space: pre;
+    }
+
+
+    ::selection {
+      background-color: #FFD700 !important;
+      color: #000 !important;
+    }
+
+
 
     </style>
 

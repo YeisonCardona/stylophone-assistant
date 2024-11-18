@@ -6,36 +6,36 @@ from radiant.framework import WebComponents
 from browser.local_storage import storage
 import re
 
-
-domain = '/stylophone-assistant'
-# domain = ''
-
 sl = WebComponents('sl')
 
 button_base = '#B3B3B3'
-button_active = 'var(--sl-color-primary-300)'
+button_active = '#c2733e'
 max_tabs = 5
-
 ignore_chars = ',-–—()'
+domain = '/stylophone-assistant'
 
-default_tabs = """
-# Super Mario for Gen X-1
+header_text = """
+<strong>Stylophone Assistant</strong> is your go-to platform for enhancing your <strong>Stylophone</strong> practice. This tool allows you to input <strong>tabs</strong> for your favorite melodies and generates a dynamic <strong>animation</strong> compatible with both the <strong>S-1</strong> and <strong>Gen X-1</strong> models. Whether you're a <strong>beginner</strong> or an <strong>experienced player</strong>, the interactive interface helps you <strong>visualize</strong> and follow along with ease. Practice at your own pace, toggle <strong>octaves</strong>, and refine your <strong>skills</strong> while having fun with your <strong>Stylophone</strong>.
+"""
+
+default_tabs = """# Super Mario for Gen X-1
+# For Generation S-1, tab 14 corresponds to tab 7 one octave higher.
 
 9 9 9 7 9 11 4
-(7 4.5 3 5 6.5 6 5 4 9 11 12 10 11 9 7 8 6.5 ) x2
+(7 4.5 3 5 6.5 6 5 4 9 11 12 10 11 9 7 8 6.5) x2
 
 7
 11 10.5 10 8.5 9  5 7 5 7 8
-11 10.5 10 8.5 9  14 14 14  # For Generation S-1, tab 14 corresponds to tab 7 one octave higher.
+11 10.5 10 8.5 9  14 14 14
 11 10.5 10 8.5 9  5 7 5 7 8 8.5 8
 
 7
-7 7 7 7 8 9 7 5 4
+7 7 7 7 8 9  7 5 4
 7 7 7 7 8 9
-7 7 7 7 8 9 7 5 4
+7 7 7 7 8 9  7 5 4
 
 9 9 9 7 9 11 4
-(7 4.5 3 5 6.5 6 5 4 9 11 12 10 11 9 7 8 6.5 ) x2
+(7 4.5 3 5 6.5 6 5 4 9 11 12 10 11 9 7 8 6.5) x2
 """
 
 equivalencia_notas = {
@@ -193,16 +193,20 @@ class StylophoneAssistant(RadiantCore):
 
             with html.DIV(Class='row').context(container) as row:
 
-                with html.DIV(Class='col-md-12').context(row) as col:
+                with html.DIV(Class='col-md-12 text-top').context(row) as col:
 
-                    col <= html.H1(
-                        'Stylophone Assistant',
-                        Class='--sl-font-sans --sl-font-size-2x-large',
-                    )
+                    col <= html.H1('Stylophone Assistant', Class='page-title')
+                    col <= html.SPAN(header_text, Class='page-header')
+                    col <= html.HR()
 
                 with html.DIV(Class='col-md-4').context(row) as col:
                     with html(
-                        sl.select(pill=True, label="Stylophone", value="x1")
+                        sl.select(
+                            pill=True,
+                            label="Stylophone",
+                            value="x1",
+                            style="margin-top: 15px;",
+                        )
                     ).context(col) as self.select_gen:
                         self.select_gen <= sl.option("Gen S-1", value='s1')
                         self.select_gen <= sl.option("Gen X-1", value='x1')
@@ -211,7 +215,12 @@ class StylophoneAssistant(RadiantCore):
 
                 with html.DIV(Class='col-md-4').context(row) as col:
                     with html(
-                        sl.select(pill=True, label="Style", value="tabs")
+                        sl.select(
+                            pill=True,
+                            label="Style",
+                            value="tabs",
+                            style="margin-top: 15px;",
+                        )
                     ).context(col) as self.select_style:
                         self.select_style <= sl.option("Tabs", value='tabs')
                         self.select_style <= sl.option("Solfège", value='solfege')
@@ -223,10 +232,11 @@ class StylophoneAssistant(RadiantCore):
                 with html.DIV(Class='col-md-12', style='margin-top: 15px;').context(
                     row
                 ) as col:
-                    with html(sl.textarea(label="Tabs", resize="auto")).context(
-                        col
-                    ) as self.textarea_s1:
+                    with html(
+                        sl.textarea(label="Tabs", resize="auto", Class='textareaa')
+                    ).context(col) as self.textarea_s1:
                         self.textarea_s1.bind("sl-input", self.textarea_save)
+                    col <= html.HR()
 
             with html.DIV(Class='row').context(container) as row:
 
@@ -243,22 +253,22 @@ class StylophoneAssistant(RadiantCore):
                     self.svg_container = html.DIV()
                     col <= self.svg_container
 
-            with html.DIV(Class='row').context(container) as row:
+            with html.DIV(Class='row tabs-line').context(container) as row:
 
                 with html.DIV(
-                    Class='col-md-5 col-sm-5',
+                    Class='col-5',
                     style='text-align: right; margin-top: 10px;',
                 ).context(row) as col:
 
                     self.span_tabs_pre = html.SPAN(
                         '...',
                         Class='--sl-font-sans',
-                        style='flex: none; letter-spacing: 5px;',
+                        style='flex: none',
                     )
                     col <= self.span_tabs_pre
 
                 with html.DIV(
-                    Class='col-md-2 col-sm-2',
+                    Class='col-2',
                     style='text-align: center;',
                 ).context(row) as col:
 
@@ -270,14 +280,14 @@ class StylophoneAssistant(RadiantCore):
                     col <= self.span_tabs_current
 
                 with html.DIV(
-                    Class='col-md-5 col-sm-5',
+                    Class='col-5',
                     style='text-align: left; margin-top: 10px;',
                 ).context(row) as col:
 
                     self.span_tabs_post = html.SPAN(
                         '...',
                         Class='--sl-font-sans',
-                        style='flex: none; letter-spacing: 5px;',
+                        style='flex: none',
                     )
                     col <= self.span_tabs_post
 
@@ -286,7 +296,7 @@ class StylophoneAssistant(RadiantCore):
             ) as row:
 
                 with html.DIV(
-                    Class='col-md-1 col-sm-3', style="display: flex;"
+                    Class='col-4 col-sm-6 icon-button-color', style="display: flex;"
                 ).context(row) as col:
 
                     with html(
@@ -299,9 +309,9 @@ class StylophoneAssistant(RadiantCore):
                     ).context(col) as button:
                         button.bind("click", self.on_button_stop)
 
-                with html.DIV(
-                    Class='col-md-2  col-sm-4', style="margin-top: 4px;"
-                ).context(row) as col:
+                with html.DIV(Class='col-8 col-sm-6', style="margin-top: 4px;").context(
+                    row
+                ) as col:
                     with html(sl.select(pill=True, value="500")).context(
                         col
                     ) as self.select_delay:
@@ -311,9 +321,9 @@ class StylophoneAssistant(RadiantCore):
                             )
                         self.select_delay.bind("sl-change", self.load_stylophone)
 
-                with html.DIV(
-                    Class='col-md-8  col-sm-5', style="margin-top: 14px;"
-                ).context(row) as col:
+                with html.DIV(Class='col-12', style="margin-top: 14px;").context(
+                    row
+                ) as col:
 
                     with html(
                         sl.range(
@@ -321,8 +331,8 @@ class StylophoneAssistant(RadiantCore):
                             max="100",
                             step=1,
                             value="0",
-                            tooltip="bottom",
-                            style="  --track-color-active: var(--sl-color-primary-600);  --track-color-inactive: var(--sl-color-primary-100);",
+                            # tooltip="bottom",
+                            style="  --track-color-active: var(--sl-color-primary-600);  --track-color-inactive: var(--sl-color-primary-100);margin-top: 20px;",
                         )
                     ).context(col) as self.range_progress:
                         self.range_progress.tooltipFormatter = (
@@ -405,11 +415,11 @@ class StylophoneAssistant(RadiantCore):
 
         if self.select_gen.value == 's1':
             tab = self.s1_tabs[self.counter_s1]
-            self.span_tabs_pre.text = ' '.join(
+            self.span_tabs_pre.text = ' - '.join(
                 self.s1_tabs[max(0, self.counter_s1 - max_tabs) : self.counter_s1]
             )
             self.span_tabs_current.text = f" {tab.strip('()')} "
-            self.span_tabs_post.text = ' '.join(
+            self.span_tabs_post.text = ' - '.join(
                 self.s1_tabs[
                     self.counter_s1
                     + 1 : min(len(self.s1_tabs), self.counter_s1 + max_tabs)
@@ -418,11 +428,11 @@ class StylophoneAssistant(RadiantCore):
 
         elif self.select_gen.value in ['both', 'x1']:
             tab = self.x1_tabs[self.counter_x1]
-            self.span_tabs_pre.text = ' '.join(
+            self.span_tabs_pre.text = ' - '.join(
                 self.x1_tabs[max(0, self.counter_x1 - max_tabs) : self.counter_x1]
             )
             self.span_tabs_current.text = f" {tab.strip('()')} "
-            self.span_tabs_post.text = ' '.join(
+            self.span_tabs_post.text = ' - '.join(
                 self.x1_tabs[
                     self.counter_x1
                     + 1 : min(len(self.x1_tabs), self.counter_x1 + max_tabs)
@@ -585,9 +595,10 @@ class StylophoneAssistant(RadiantCore):
 if __name__ == '__main__':
     RadiantServer(
         'StylophoneAssistant',
+        host='0.0.0.0',
         template='template.html',
         page_title="Stylophone Assistant",
-        domain=domain,
         static_app='docs',
-        # domain='',
+        domain=domain,
+        # domain='/stylophone-assistant',
     )
