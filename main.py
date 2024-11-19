@@ -22,112 +22,93 @@ default_tabs = """# Write tabs here
 
 """
 
-equivalencia_notas = {
-    # Notas de la 3ª octava
-    1: ("8", "-1"),
-    1.5: ("8.5", "-1"),
-    2: ("9", "-1"),
+# Con el switch en la posición 2 en el S-1 y sin modificador de octavas en la X-1
+# Asume que la octava central del S-1, corresponde con la primera octava del X-1
+equivalencia_notas_mode1 = {
+    # tab(S-1): (tab X-1, modificador de octava)
+    # Notas de la 3ª octava (Al no estar en el X-1 necesitan modificador)
+    "1": ("8", "-1"),
+    "1.5": ("8.5", "-1"),
+    "2": ("9", "-1"),
     # Notas de la 4ª octava
-    3: ("3", "0"),
-    3.5: ("3.5", "0"),
-    4: ("4", "0"),
-    4.5: ("4.5", "0"),
-    5: ("5", "0"),
-    6: ("6", "0"),
-    6.5: ("6.5", "0"),
-    7: ("7", "0"),
-    7.5: ("7.5", "0"),
-    8: ("8", "0"),
-    8.5: ("8.5", "0"),
-    9: ("9", "0"),
+    "3": ("3", "0"),
+    "3.5": ("3.5", "0"),
+    "4": ("4", "0"),
+    "4.5": ("4.5", "0"),
+    "5": ("5", "0"),
+    "6": ("6", "0"),
+    "6.5": ("6.5", "0"),
+    "7": ("7", "0"),
+    "7.5": ("7.5", "0"),
+    "8": ("8", "0"),
+    "8.5": ("8.5", "0"),
+    "9": ("9", "0"),
     # Notas de la 5ª octava
-    10: ("10", "0"),
-    10.5: ("10.5", "0"),
-    11: ("11", "0"),
-    11.5: ("11.5", "0"),
-    12: ("12", "0"),
+    "10": ("10", "0"),
+    "10.5": ("10.5", "0"),
+    "11": ("11", "0"),
+    "11.5": ("11.5", "0"),
+    "12": ("12", "0"),
     # Notas de la 5ª octava que no están en la S1
-    13: ("13", "0"),
-    13.5: ("13.5", "0"),
-    14: ("14", "0"),
-    14.5: ("14.5", "0"),
-    15: ("15", "0"),
-    15.5: ("15.5", "0"),
-    16: ("16", "0"),
+    "13": ("13", "0"),
+    "13.5": ("13.5", "0"),
+    "14": ("14", "0"),
+    "14.5": ("14.5", "0"),
+    "15": ("15", "0"),
+    "15.5": ("15.5", "0"),
+    "16": ("16", "0"),
 }
 
 
-equivalencia_notas_1 = {
+# Con el switch en la posición 2 en el S-1 y sin modificador de octavas en la X-1
+# Asume que la octava central del S-1, corresponde con la segunda octava del X-1, es decir que por defecto esta en el modificador -1
+equivalencia_notas_mode2 = {
     # Notas de la 3ª octava
-    1: ("1", "0"),
-    1.5: ("1.5", "0"),
-    2: ("2", "0"),
+    "1": ("1", "0"),
+    "1.5": ("1.5", "0"),
+    "2": ("2", "0"),
     # Notas de la 4ª octava
-    3: ("3", "0"),
-    3.5: ("3.5", "0"),
-    4: ("4", "0"),
-    4.5: ("4.5", "0"),
-    5: ("5", "0"),
-    6: ("6", "0"),
-    6.5: ("6.5", "0"),
-    7: ("7", "0"),
-    7.5: ("7.5", "0"),
-    8: ("8", "0"),
-    8.5: ("8.5", "0"),
-    9: ("9", "0"),
-    # Notas de la 5ª octava
-    10: ("3", "-1"),
-    10.5: ("3.5", "-1"),
-    11: ("4", "-1"),
-    11.5: ("4.5", "-1"),
-    12: ("5", "-1"),
+    "3": ("3", "0"),
+    "3.5": ("3.5", "0"),
+    "4": ("4", "0"),
+    "4.5": ("4.5", "0"),
+    "5": ("5", "0"),
+    "6": ("6", "0"),
+    "6.5": ("6.5", "0"),
+    "7": ("7", "0"),
+    "7.5": ("7.5", "0"),
+    "8": ("8", "0"),
+    "8.5": ("8.5", "0"),
+    "9": ("9", "0"),
+    # Notas de la 5ª octava que no están en esta configuración del X-1
+    "10": ("3", "-2"),
+    "10.5": ("3.5", "-2"),
+    "11": ("4", "-2"),
+    "11.5": ("4.5", "-2"),
+    "12": ("5", "-2"),
 }
 
 
-def convertir_secuencia(secuencia, equivalencia):
+# ----------------------------------------------------------------------
+def convertir_secuencia(secuencia, equivalencia, modificador):
     """"""
-    notas = []
-    for nota in secuencia.split():
-
-        if nota.startswith('('):
-            notas.append('(')
-            try:
-                notas.append(nota.strip('()'))
-            except:
-                pass
-
-        elif nota.endswith(')'):
-            try:
-                notas.append(nota.strip('()'))
-            except:
-                pass
-            notas.append(')')
-
-        elif nota.startswith('x') or nota.endswith('x'):
-            notas.append(nota)
-
-        else:
-            try:
-                notas.append(float(nota))
-            except:
-                pass
-
+    notas = secuencia.split(' ')
     secuencia_convertida = []
 
     for nota in notas:
         if nota in equivalencia:
             genx1_pos, octava = equivalencia[nota]
+            if modificador == '-1':
+                octava = str(int(octava) - int(modificador) - 1)
+
             if octava == '0':
                 secuencia_convertida.append(f"{genx1_pos}")
             else:
                 secuencia_convertida.append(f"({octava}:{genx1_pos})")
         else:
-            secuencia_convertida.append(str(nota))
+            secuencia_convertida.append(nota)
 
     secuencia_convertida = " ".join(secuencia_convertida)
-    secuencia_convertida = secuencia_convertida.replace('( ', '(')
-    secuencia_convertida = secuencia_convertida.replace(' )', ')')
-
     return secuencia_convertida
 
 
@@ -145,9 +126,10 @@ def load_tabs():
             tabs[filename] = file.read()
 
     with open('tabs/tabs.json', 'w') as file:
-        json.dump(tabs, file)
+        json.dump(tabs, file, indent='  ')
 
 
+# ----------------------------------------------------------------------
 def descomprimir_texto(texto):
     """
     Descomprime líneas que contienen patrones como '(contenido)x2' o '(contenido) x2'
@@ -251,6 +233,57 @@ class StylophoneAssistant(RadiantCore):
                         sl.textarea(label="Tabs", resize="auto", spellcheck="false")
                     ).context(col) as self.textarea_s1:
                         self.textarea_s1.bind("sl-input", self.textarea_save)
+
+            with html.DIV(Class='row', style='margin-top: 20px;').context(
+                container
+            ) as row:
+
+                with html.DIV(Class='col-md-3', style='margin-top: 15px;').context(
+                    row
+                ) as col:
+                    self.switch_transpose = sl.switch("Transpose Tabs")
+                    col <= self.switch_transpose
+                    self.switch_transpose.bind("sl-input", self.activate_transpose)
+
+                with html.DIV(Class='col-md-9', style='margin-top: -5px;').context(
+                    row
+                ) as col:
+
+                    self.range_transpose = sl.range(
+                        min="-12",
+                        max="+12",
+                        step=1,
+                        value="0",
+                        style="--track-active-offset: 50%; --track-color-active: var(--sl-color-primary-600);  --track-color-inactive: var(--sl-color-primary-100);margin-top: 20px;",
+                    )
+                    col <= self.range_transpose
+                    self.range_transpose.bind("sl-input", self.update_transposed_tabs)
+                    self.range_transpose.tooltipFormatter = (
+                        lambda value: f"{'+' if value > 0 else ''}{value} semitone{'' if value in [1, 1 , 0] else 's'}"
+                    )
+                    self.range_transpose.style.display = 'none'
+
+                with html.DIV(Class='col-md-12', style='margin-top: 15px;').context(
+                    row
+                ) as col:
+
+                    with html(
+                        sl.textarea(
+                            label="Transposed Tabs", resize="auto", spellcheck="false"
+                        )
+                    ).context(col) as self.textarea_transpose:
+                        self.textarea_transpose.bind("sl-input", self.textarea_save)
+                        self.textarea_transpose.style.display = 'none'
+
+                    self.switch_transpose_model = sl.switch(
+                        "Transpose for X-1", checked=True, style='margin-top: 10px;'
+                    )
+                    col <= self.switch_transpose_model
+                    self.switch_transpose_model.style.display = 'none'
+                    self.switch_transpose_model.bind(
+                        "sl-input", self.update_transposed_tabs
+                    )
+
                     col <= html.HR()
 
             with html.DIV(Class='row').context(container) as row:
@@ -385,18 +418,24 @@ class StylophoneAssistant(RadiantCore):
                 tabs_decomented.append(line)
 
         tabs = ' \n '.join(tabs_decomented)
+
         for char in ignore_chars:
             tabs = tabs.replace(char, ' ')
-        return ' '.join(tabs.split())
+
+        tabs_clear = []
+        for line in tabs.split('\n'):
+            tabs_clear.append(' '.join(line.split()))
+
+        return '\n'.join(tabs_clear).strip('\n')
 
     # ----------------------------------------------------------------------
     @property
     def tabla_equivalencias(self):
         """"""
         if self.switch_x1_8va.checked:
-            return equivalencia_notas_1
+            return equivalencia_notas_mode2
         else:
-            return equivalencia_notas
+            return equivalencia_notas_mode1
 
     # ----------------------------------------------------------------------
     def textarea_save(self, event=None):
@@ -411,6 +450,7 @@ class StylophoneAssistant(RadiantCore):
         self.range_progress.min = 0
         self.range_progress.max = len(self.normalized_tabs.split(' ')) - 1
 
+        print("Input tabs:", self.textarea_s1.value)
         print("Normalized tabs:", self.normalized_tabs)
         print('S-1 tabs:', ' '.join(self.s1_tabs))
         print('X-1 tabs:', ' '.join(self.x1_tabs))
@@ -426,8 +466,11 @@ class StylophoneAssistant(RadiantCore):
     def update_tabs_preview(self):
         """"""
         self.s1_tabs = self.normalized_tabs.split(' ')
+
         self.x1_tabs = convertir_secuencia(
-            self.normalized_tabs, self.tabla_equivalencias
+            self.normalized_tabs,
+            self.tabla_equivalencias,
+            '-1' if self.switch_x1_8va.checked else '0',
         ).split(' ')
 
         if self.select_gen.value == 's1':
@@ -480,6 +523,7 @@ class StylophoneAssistant(RadiantCore):
     # ----------------------------------------------------------------------
     def on_button_stop(self, event):
         self.stop = True
+        self.range_progress.value = 0
 
     # ----------------------------------------------------------------------
     def load_stylophone(self, event=None, gen=None, style=None, x1_8va=None):
@@ -560,6 +604,8 @@ class StylophoneAssistant(RadiantCore):
             option = document[f'id-{tab}']
             self.textarea_s1.value = option.attrs['tabs']
         self.textarea_save()
+        if self.switch_transpose.checked:
+            self.update_transposed_tabs()
 
     # ----------------------------------------------------------------------
     def clear(self, tab):
@@ -614,12 +660,26 @@ class StylophoneAssistant(RadiantCore):
         else:
             self.counter_x1 += 1
 
-        if tab.strip('()').replace('-1:', '').replace('.', '').isdigit():
+        if (
+            tab.strip('()')
+            .replace('-1:', '')
+            .replace('-2:', '')
+            .replace('.', '')
+            .isdigit()
+        ):
 
             if '-1' in tab:
                 tab = tab.strip('()').replace('-1:', '')
                 svg_element = document[f"tab_x{tab.replace('.', '_')}"]
                 document["tab_xm1"].style.fill = button_active
+                self.clear("tab_xm2")
+
+            if '-2' in tab:
+                tab = tab.strip('()').replace('-2:', '')
+                svg_element = document[f"tab_x{tab.replace('.', '_')}"]
+                document["tab_xm2"].style.fill = button_active
+                self.clear("tab_xm1")
+
             else:
                 tab = tab.strip('()')
                 svg_element = document[f"tab_x{tab.replace('.', '_')}"]
@@ -638,11 +698,69 @@ class StylophoneAssistant(RadiantCore):
             timer.set_timeout(
                 lambda: self.clear("tab_xm1"), float(self.select_delay.value)
             )
+        timer.set_timeout(lambda: self.clear("tab_xm2"), float(self.select_delay.value))
 
         if not self.stop:
             timer.set_timeout(self.animate_x1, float(self.select_delay.value))
         else:
             self.range_progress.value = 0
+
+    # ----------------------------------------------------------------------
+    def activate_transpose(self, event=None):
+        """"""
+        if not event.target.checked:
+            self.range_transpose.style.display = 'none'
+            self.textarea_transpose.style.display = 'none'
+            self.switch_transpose_model.style.display = 'none'
+        else:
+            self.range_transpose.style.display = 'block'
+            self.textarea_transpose.style.display = 'block'
+            self.switch_transpose_model.style.display = 'block'
+            self.update_transposed_tabs()
+
+    # ----------------------------------------------------------------------
+    def update_transposed_tabs(self, event=None):
+        """"""
+        value = self.range_transpose.value
+        if self.switch_transpose_model.checked:
+            scale = "1 1.5 2 3 3.5 4 4.5 5 6 6.5 7 7.5 8 8.5 9 10 10.5 11 11.5 12 13 13.5 14 14.5 15 15.5 16".split()
+        else:
+            scale = (
+                "1 1.5 2 3 3.5 4 4.5 5 6 6.5 7 7.5 8 8.5 9 10 10.5 11 11.5 12".split()
+            )
+
+        tabs_lines = self.normalized_tabs.split('\n')
+        transposed_tabs = []
+
+        for line in tabs_lines:
+
+            for tab in line.split(' '):
+                if tab in scale:
+
+                    index = scale.index(tab) + value
+
+                    if index < 0:
+                        new_tab = f'+1:{scale[index+12]}'
+
+                    elif 0 <= index < len(scale):
+                        new_tab = scale[index]
+
+                    elif index >= len(scale):
+                        new_tab = f'-1:{scale[index-12]}'
+
+                    transposed_tabs.append(new_tab)
+
+                elif tab:
+                    transposed_tabs.append(f'E:{tab}')
+                else:
+                    transposed_tabs.append(tab)
+
+            transposed_tabs.append('\n')
+
+        tabs_clear = []
+        for line in (' '.join(transposed_tabs)).split('\n'):
+            tabs_clear.append(' '.join(line.split()))
+        self.textarea_transpose.value = '\n'.join(tabs_clear).strip('\n')
 
 
 if __name__ == '__main__':
