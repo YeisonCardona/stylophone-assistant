@@ -465,13 +465,23 @@ class StylophoneAssistant(RadiantCore):
     # ----------------------------------------------------------------------
     def update_tabs_preview(self):
         """"""
-        self.s1_tabs = self.normalized_tabs.split(' ')
+        if self.switch_transpose.checked:
+            self.update_transposed_tabs()
 
-        self.x1_tabs = convertir_secuencia(
-            self.normalized_tabs,
-            self.tabla_equivalencias,
-            '-1' if self.switch_x1_8va.checked else '0',
-        ).split(' ')
+            self.s1_tabs = self.textarea_transpose.value.split(' ')
+            self.x1_tabs = convertir_secuencia(
+                self.textarea_transpose.value,
+                self.tabla_equivalencias,
+                '-1' if self.switch_x1_8va.checked else '0',
+            ).split(' ')
+
+        else:
+            self.s1_tabs = self.normalized_tabs.split(' ')
+            self.x1_tabs = convertir_secuencia(
+                self.normalized_tabs,
+                self.tabla_equivalencias,
+                '-1' if self.switch_x1_8va.checked else '0',
+            ).split(' ')
 
         if self.select_gen.value == 's1':
             tab = self.s1_tabs[self.counter_s1]
