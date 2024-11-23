@@ -118,7 +118,7 @@ def load_tabs():
     import os
     import json
 
-    files = os.listdir('tabs')
+    files = sorted(os.listdir('tabs'))
 
     tabs = {}
     for filename in filter(lambda f: f.endswith('.txt'), files):
@@ -348,14 +348,15 @@ class StylophoneAssistant(RadiantCore):
                 ).context(row) as col:
 
                     with html(
-                        sl.icon_button(name="play-circle", style="font-size: 2rem;")
-                    ).context(col) as button:
-                        button.bind("click", self.on_button_start)
+                        sl.icon_button(name="play-circle", style="font-size: 3rem;")
+                    ).context(col) as self.button_start:
+                        self.button_start.bind("click", self.on_button_start)
 
                     with html(
-                        sl.icon_button(name="stop-circle", style="font-size: 2rem;")
-                    ).context(col) as button:
-                        button.bind("click", self.on_button_stop)
+                        sl.icon_button(name="stop-circle", style="font-size: 3rem;")
+                    ).context(col) as self.button_stop:
+                        self.button_stop.bind("click", self.on_button_stop)
+                        self.button_stop.attrs['disabled'] = True
 
                 with html.DIV(Class='col-8 col-sm-6', style="margin-top: 4px;").context(
                     row
@@ -512,6 +513,8 @@ class StylophoneAssistant(RadiantCore):
     # ----------------------------------------------------------------------
     def on_button_start(self, event):
         self.stop = False
+        self.button_start.attrs['disabled'] = True
+        del self.button_stop.attrs['disabled']
 
         self.counter_s1 = self.range_progress.value
         self.counter_x1 = self.range_progress.value
@@ -533,7 +536,10 @@ class StylophoneAssistant(RadiantCore):
     # ----------------------------------------------------------------------
     def on_button_stop(self, event):
         self.stop = True
-        self.range_progress.value = 0
+        self.button_stop.attrs['disabled'] = True
+        del self.button_start.attrs['disabled']
+
+        # self.range_progress.value = 0
 
     # ----------------------------------------------------------------------
     def load_stylophone(self, event=None, gen=None, style=None, x1_8va=None):
@@ -783,5 +789,4 @@ if __name__ == '__main__':
         page_title="Stylophone Assistant",
         static_app='docs',
         domain=domain,
-        # domain='/stylophone-assistant',
     )
