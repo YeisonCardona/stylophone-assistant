@@ -6,7 +6,7 @@ from radiant.framework import WebComponents
 from browser.local_storage import storage
 import re
 
-sl = WebComponents('sl')
+sl = WebComponents('wa')
 
 button_base = '#B3B3B3'
 button_active = '#c2733e'
@@ -281,8 +281,8 @@ class StylophoneAssistant(RadiantCore):
                         self.select_gen <= sl.option("Gen S-1", value='s1')
                         self.select_gen <= sl.option("Gen X-1", value='x1')
                         self.select_gen <= sl.option("Both", value='both')
-                        self.select_gen.bind("sl-change", self.load_stylophone)
-
+                        self.select_gen.bind("wa-change", self.load_stylophone)
+                    
                 with html.DIV(Class='col-md-4').context(row) as col:
                     with html(
                         sl.select(
@@ -295,7 +295,7 @@ class StylophoneAssistant(RadiantCore):
                         self.select_style <= sl.option("Tabs", value='tabs')
                         self.select_style <= sl.option("Solfège", value='solfege')
                         self.select_style <= sl.option("American", value='kids')
-                        self.select_style.bind("sl-change", self.load_stylophone)
+                        self.select_style.bind("wa-change", self.load_stylophone)
 
             with html.DIV(Class='row').context(container) as row:
 
@@ -309,7 +309,7 @@ class StylophoneAssistant(RadiantCore):
                         )
                     ).context(col) as self.select_tab:
                         self.select_tab <= sl.option("Custom", value='custom')
-                        self.select_tab.bind("sl-change", self.load_tab_in_textarea)
+                        self.select_tab.bind("wa-change", self.load_tab_in_textarea)
 
             with html.DIV(Class='row').context(container) as row:
 
@@ -319,7 +319,7 @@ class StylophoneAssistant(RadiantCore):
                     with html(
                         sl.textarea(label="Tabs", resize="auto", spellcheck="false")
                     ).context(col) as self.textarea_s1:
-                        self.textarea_s1.bind("sl-input", self.save_tabs)
+                        self.textarea_s1.bind("wa-input", self.save_tabs)
 
             with html.DIV(Class='row', style='margin-top: 20px;').context(
                 container
@@ -330,7 +330,7 @@ class StylophoneAssistant(RadiantCore):
                 ) as col:
                     self.switch_transpose = sl.switch("Transpose Tabs (Chromatic)")
                     col <= self.switch_transpose
-                    self.switch_transpose.bind("sl-input", self.activate_transpose)
+                    self.switch_transpose.bind("wa-input", self.activate_transpose)
 
                 with html.DIV(Class='col-md-9', style='margin-top: -5px;').context(
                     row
@@ -341,10 +341,10 @@ class StylophoneAssistant(RadiantCore):
                         max="+12",
                         step=1,
                         value="0",
-                        style="--track-active-offset: 50%; --track-color-active: var(--sl-color-primary-600);  --track-color-inactive: var(--sl-color-primary-100);margin-top: 20px;",
+                        style="--track-active-offset: 50%; --thumb-shadow: none; --track-color-active: var(--wa-color-primary-600);  --track-color-inactive: var(--wa-color-primary-100); margin-top: 20px;",
                     )
                     col <= self.range_transpose
-                    self.range_transpose.bind("sl-input", self.update_transposed_tabs)
+                    self.range_transpose.bind("wa-input", self.update_transposed_tabs)
                     self.range_transpose.tooltipFormatter = (
                         lambda value: f"{'+' if value > 0 else ''}{value} semitone{'' if value in [1, 1 , 0] else 's'}"
                     )
@@ -361,7 +361,7 @@ class StylophoneAssistant(RadiantCore):
                             spellcheck="false",
                         )
                     ).context(col) as self.textarea_transpose:
-                        self.textarea_transpose.bind("sl-input", self.save_tabs)
+                        self.textarea_transpose.bind("wa-input", self.save_tabs)
                         self.textarea_transpose.style.display = 'none'
 
                     self.switch_transpose_model = sl.switch(
@@ -370,7 +370,7 @@ class StylophoneAssistant(RadiantCore):
                     col <= self.switch_transpose_model
                     self.switch_transpose_model.style.display = 'none'
                     self.switch_transpose_model.bind(
-                        "sl-input", self.update_transposed_tabs
+                        "wa-input", self.update_transposed_tabs
                     )
 
                     col <= html.HR()
@@ -382,7 +382,7 @@ class StylophoneAssistant(RadiantCore):
                 ) as col:
                     self.switch_x1_8va = sl.switch("Gen X-1 -1 Octave")
                     col <= self.switch_x1_8va
-                    self.switch_x1_8va.bind("sl-input", self.load_stylophone)
+                    self.switch_x1_8va.bind("wa-input", self.load_stylophone)
 
                 with html.DIV(Class='col-md-12', style='margin-top: 15px;').context(
                     row
@@ -399,7 +399,7 @@ class StylophoneAssistant(RadiantCore):
 
                     self.span_tabs_pre = html.SPAN(
                         '...',
-                        Class='--sl-font-sans',
+                        Class='--wa-font-sans',
                         style='flex: none',
                     )
                     col <= self.span_tabs_pre
@@ -411,8 +411,8 @@ class StylophoneAssistant(RadiantCore):
 
                     self.span_tabs_current = html.SPAN(
                         '#',
-                        Class='--sl-font-sans',
-                        style=f'flex: none; color: var(--sl-color-primary-600); font-size: 2rem;',
+                        Class='--wa-font-sans',
+                        style=f'flex: none; color: var(--wa-color-primary-600); font-size: 2rem;',
                     )
                     col <= self.span_tabs_current
 
@@ -423,7 +423,7 @@ class StylophoneAssistant(RadiantCore):
 
                     self.span_tabs_post = html.SPAN(
                         '...',
-                        Class='--sl-font-sans',
+                        Class='--wa-font-sans',
                         style='flex: none',
                     )
                     col <= self.span_tabs_post
@@ -457,7 +457,7 @@ class StylophoneAssistant(RadiantCore):
                             self.select_delay <= sl.option(
                                 f"Delay: {i / 1000 :.1f} s", value=f"{i}"
                             )
-                        self.select_delay.bind("sl-change", self.load_stylophone)
+                        self.select_delay.bind("wa-change", self.load_stylophone)
 
                 with html.DIV(Class='col-12', style="margin-top: 14px;").context(
                     row
@@ -469,13 +469,13 @@ class StylophoneAssistant(RadiantCore):
                             max="100",
                             step=1,
                             value="0",
-                            style="  --track-color-active: var(--sl-color-primary-600);  --track-color-inactive: var(--sl-color-primary-100);margin-top: 20px;",
+                            style="  --track-color-active: var(--wa-color-primary-600); --thumb-shadow: none;  --track-color-inactive: var(--wa-color-primary-100);margin-top: 20px;",
                         )
                     ).context(col) as self.range_progress:
                         self.range_progress.tooltipFormatter = (
                             lambda value: f"Tab {value + 1}"
                         )
-                        self.range_progress.bind("sl-input", self.range_progress_change)
+                        self.range_progress.bind("wa-input", self.range_progress_change)
 
         timer.set_timeout(self.initialize, 500)
 
@@ -508,6 +508,8 @@ class StylophoneAssistant(RadiantCore):
         # Load the stylophone SVG and tabs
         self.load_stylophone(generation='x1', style='tabs', x1_octave_modifier='')
         self.load_tabs()
+        
+        self.select_gen.attrs['value'] = 'x1'
 
     # ----------------------------------------------------------------------
     @property

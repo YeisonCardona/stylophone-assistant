@@ -3,8 +3,17 @@
 {% block html_head %}
 
     <!--Shoelace-->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.18.0/cdn/themes/light.css" />
-    <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.18.0/cdn/shoelace-autoloader.js"></script>
+    <!--<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.18.0/cdn/themes/light.css" />-->
+    <!--<script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.18.0/cdn/shoelace-autoloader.js"></script>-->
+        
+    
+    <!--Web Awesome-->
+    <script type="module" src="https://early.webawesome.com/webawesome@3.0.0-alpha.4/dist/webawesome.loader.js"></script>
+    <link rel="stylesheet" href="https://early.webawesome.com/webawesome@3.0.0-alpha.4/dist/themes/default.css" />
+    <script type="module">
+      await import("https://early.webawesome.com/webawesome@3.0.0-alpha.4/dist/components/option/option.js")
+      await import("https://early.webawesome.com/webawesome@3.0.0-alpha.4/dist/components/select/select.js")
+    </script>
 
     <!--Fonts-->
     <!--<link type="text/css" rel="stylesheet" href="{{domain}}/root/static/fonts/segou_ui_4/segoe.css">-->
@@ -17,8 +26,8 @@
 
 
 
-    .button-group-toolbar sl-button-group:not(:last-of-type) {
-      margin-right: var(--sl-spacing-x-small);
+    .button-group-toolbar wa-button-group:not(:last-of-type) {
+      margin-right: var(--wa-spacing-x-small);
       }
 
       .text-top {
@@ -30,7 +39,7 @@
     }
 
 
-    sl-textarea::part(base) {
+    wa-textarea::part(base) {
       font-family: monospace;
       font-size: 1em !important;
     }
@@ -48,55 +57,52 @@
 
 
 
-        body {
-          background-color: #EBDAC6;
-          color: #56321F;
-          font-family: 'Cinzel', serif;
-          padding-bottom:30px;
-        }
+      body {
+        background-color: #EBDAC6;
+        color: #56321F;
+        font-family: 'Cinzel', serif;
+        padding-bottom:30px;
+      }
 
 
 
       :root {
 
-        --sl-input-background-color: #F4EED8;
-        --sl-input-border-color: #56321F;
+        --wa-form-control-background-color: #F4EED8;
+        --wa-form-control-resting-color: #56321F;
+        --wa-form-control-value-color: #56321F;
+        
+        --wa-line-height-expanded: 1.5;
+        
+        --wa-color-brand-fill-loud: #56321F;
+        --wa-color-surface-raised: #f4eed8;
+        --wa-color-surface-border: #56321F;
+        
+        --wa-color-neutral-fill-normal: #f4e7b1;
+        
+        --wa-focus-ring: var(--wa-focus-ring-style) var(--wa-focus-ring-width) #56321F2b;
+        
+        
 
+        --wa-color-primary-100: #F4EED8;
+        --wa-color-primary-500: #ab7755;
+        --wa-color-primary-600: #56321F;
 
-        --sl-input-border-color-hover: var(--sl-input-border-color);
-        --sl-input-border-color-focus: var(--sl-input-border-color);
-        --sl-input-border-color-disabled: var(--sl-input-border-color);
-
-        --sl-input-focus-ring-color: #56321F2b;
-
-        --sl-panel-background-color: #F4EED8;
-        --sl-panel-border-color: #56321F;
-
-        --sl-color-primary-100: #F4EED8;
-        --sl-color-primary-500: #ab7755;
-        --sl-color-primary-600: #56321F;
-
-        --sl-color-neutral-0: #f4eed8;
-        --sl-color-neutral-100: #f4e7b1;
-        --sl-color-neutral-400: #977b69;
-
-
-        --sl-input-color: #56321F;
 
 
 
       }
 
-      .icon-button-color sl-icon-button::part(base) {
+      .icon-button-color wa-icon-button::part(base) {
         color: #56321F;
       }
 
-      .icon-button-color sl-icon-button::part(base):hover,
-      .icon-button-color sl-icon-button::part(base):focus {
+      .icon-button-color wa-icon-button::part(base):hover,
+      .icon-button-color wa-icon-button::part(base):focus {
         color: #ab7755;
       }
 
-      .icon-button-color sl-icon-button::part(base):active {
+      .icon-button-color wa-icon-button::part(base):active {
         color: #977b69;
       }
 
