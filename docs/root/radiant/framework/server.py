@@ -169,6 +169,7 @@ class ThemeHandler(RequestHandler):
 ########################################################################
 class RadiantHandler(RequestHandler):
     """"""
+    domain = ''
 
     # ----------------------------------------------------------------------
     def initialize(self, **kwargs):
@@ -215,8 +216,12 @@ class RadiantHandler(RequestHandler):
 
             with open(os.path.join(parent_dir, 'index.html'), 'wb') as file:
                 file.write(html)
-
-            with open(os.path.join(parent_dir, 'environ.json'), 'w') as file:
+                
+            environ_path = os.path.join(parent_dir, self.domain.lstrip("/"))
+            if not os.path.exists(environ_path):
+                os.mkdir(environ_path)
+            
+            with open(os.path.join(environ_path, 'environ.json'), 'w') as file:
                 json.dump(self.initial_arguments, file)
 
             for element in ['CNAME', '.nojekyll']:
@@ -344,6 +349,7 @@ def make_app(
 
     app = []
     if class_ != 'RadiantAPI':
+        RadiantHandler.domain = domain
         app += [url(r'^/$', RadiantHandler, environ)]
 
     app += [

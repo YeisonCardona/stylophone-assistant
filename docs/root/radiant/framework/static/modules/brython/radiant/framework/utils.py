@@ -19,7 +19,12 @@ class Environ_:
         try:
             self.environ = json.load(open('/stylophone-assistant/environ.json'))
         except:
-            self.environ = json.load(open('/environ.json'))
+            pass
+            
+    # ----------------------------------------------------------------------
+    def set_root(self, root):
+        """"""
+        self.environ = json.load(open(f'{root}/environ.json'))        
 
     # ----------------------------------------------------------------------
     def __call__(self, value, default=None):
