@@ -1,5 +1,5 @@
 from radiant.framework.server import RadiantCore, RadiantServer
-from radiant.framework import html, Element
+from radiant.framework import html, Element, select
 from browser import document, svg, ajax
 from browser import timer
 from radiant.framework import WebComponents
@@ -9,13 +9,79 @@ import re
 sl = WebComponents('wa')
 
 button_base = '#B3B3B3'
-button_active = '#c2733e'
+button_active = '#000000'
 max_tabs = 5
 ignore_chars = ',-–—()<>'
 domain = '/stylophone-assistant'
 
 header_text = """
 <strong>Stylophone Assistant</strong> is your go-to platform for enhancing your <strong>Stylophone</strong> practice. This tool allows you to input <strong>tabs</strong> for your favorite melodies and generates a dynamic <strong>animation</strong> compatible with both the <strong>S-1</strong> and <strong>Gen X-1</strong> models. Whether you're a <strong>beginner</strong> or an <strong>experienced player</strong>, the interactive interface helps you <strong>visualize</strong> and follow along with ease. Practice at your own pace, toggle <strong>octaves</strong>, and refine your <strong>skills</strong> while having fun with your <strong>Stylophone</strong>.
+"""
+
+tunning_text = f"""
+    <h1>Guide to Tuning Your Stylophone Device</h1>
+    <p>The following guide provides step-by-step instructions on how to properly tune your Stylophone (S1 or Gen X-1). This ensures optimal functionality and access to a balanced tonal range. Follow these steps carefully:</p>
+    <hr>
+
+    <h2>1. Prepare Your Stylophone</h2>
+    <ul>
+        <li>Power on the device.</li>
+        <li>Ensure the stylus and keys are clean for optimal electrical contact.</li>
+        <li>Place the device in a stable position, preferably on a flat surface, to avoid interference during adjustments.</li>
+    </ul>
+
+    <h2>2. Locate the Tuning Knob</h2>
+    <p>Both the <strong>Stylophone S1</strong> and <strong>Gen X-1</strong> models have a <strong>tuning knob located on the back panel</strong>. No tools are required; simply turn the knob with your fingers to make adjustments.</p>
+
+    <h2>3. Set the Base Scale</h2>
+    <ul>
+        <li>Play the <strong>fourth scale</strong> (middle C or equivalent, depending on the tuning standard you wish to use).</li>
+        <li>Adjust the tuning knob to ensure the note aligns with the desired pitch (e.g., A=440Hz if tuning to standard pitch).</li>
+    </ul>
+
+    <h2>4. Test Sub-Octave Modifiers</h2>
+    <ul>
+        <li>Engage the <strong>sub-octave modifiers</strong> (if using the Gen X-1 or an equivalent model).</li>
+        <li>Verify that the third octave below is accessible and aligns correctly with its respective pitch.</li>
+        <li>Confirm that the fifth octave above is also accessible when disabling the sub-octave modifiers.</li>
+    </ul>
+    <blockquote>
+        <strong>Tip:</strong> The goal is to leave the <strong>fourth scale</strong> in a central position so it provides flexibility for both downward and upward tonal adjustments.
+    </blockquote>
+
+    <h2>5. Fine-Tune the Pitch</h2>
+    <ul>
+        <li>Use a tuning application or chromatic tuner for precision.</li>
+        <li>
+            <strong>Tip for Precision Tuning:</strong> To achieve more accurate tuning, use <strong>both the tuning knob and the tuning control</strong> on the back panel:
+            <ol>
+                <li><strong>Adjust one octave</strong> using the tuning knob (the larger, finger-operated control).</li>
+                <li>Move to another octave and fine-tune it using the smaller tuning control, which requires a screwdriver.</li>
+                <li>Repeat this process alternately between the two controls until both octaves are accurately tuned.</li>
+            </ol>
+        </li>
+        <li>Continue making minor adjustments until the pitch is stable and all octaves align correctly.</li>
+    </ul>
+
+    <figure>
+        <img src="{domain}/root/assets/stylophone_both_tabs_tunning.svg" alt="Stylophone tuning diagram" style="max-width: 100%; height: auto;">
+        <figcaption>Diagram showing the tuning knob and tuning control positions on the Stylophone.</figcaption>
+    </figure>
+
+    <h2>6. Verify the Entire Range</h2>
+    <ul>
+        <li>Test the device by playing scales across its full range.</li>
+        <li>Ensure smooth transitions and accurate pitch representation.</li>
+    </ul>
+
+    <h2>Additional Notes</h2>
+    <ul>
+        <li>Always tune the device in a quiet environment to avoid misjudging the pitch.</li>
+        <li>Periodic retuning may be necessary depending on usage and environmental factors such as temperature or humidity.</li>
+        <li>Avoid over-adjusting the tuning knob, as it may damage the device's mechanism.</li>
+    </ul>
+
+    <p>By following these steps, your Stylophone will be perfectly tuned and ready for use in any musical context.</p>
 """
 
 default_tabs = """# Write tabs here
@@ -259,20 +325,36 @@ class StylophoneAssistant(RadiantCore):
         super().__init__(*args, **kwargs)
         self.loaded = False
 
-        with html.DIV(Class='container').context(self.body) as container:
+        with html.DIV(Class='container-fluid').context(self.body) as container:
+            with html.DIV(Class='row  sa-header').context(container) as header:
+                with html.DIV(Class='col-md-4').context(header) as col:
+                    col <= html.H1('STYLOPHONE ASSISTANT', Class='header-title')
+
+                with html.DIV(Class='col-md-8 sa-toolbar').context(header) as col:
+
+                    with html(sl.tab_group()).context(col) as toolbar:
+
+                        toolbar <= sl.tab('Assistant', Class='sa-auto-show', sa_tab_to_show="sa-tab-assistant", slot='nav', panel="assistant")
+                        toolbar <= sl.tab('Tunning', Class='sa-auto-show', sa_tab_to_show="sa-tab-tunning", slot='nav', panel="tunning")
+                        toolbar <= sl.tab(html.A('GitHub', Class='sa-tab-link', href='https://github.com/YeisonCardona/stylophone-assistant'), slot='nav')
+                        select('.sa-auto-show').bind('click', self.auto_show)
+
+        with html.DIV(Class='container sa-tabs sa-tab-tunning', style='display: none;').context(self.body) as container:
+            container <= html.SPAN(tunning_text, Class='sa-paragraph')
+
+        with html.DIV(Class='container sa-tabs sa-tab-assistant').context(self.body) as container:
 
             with html.DIV(Class='row').context(container) as row:
 
-                with html.DIV(Class='col-md-12 text-top').context(row) as col:
+                with html.DIV(Class='col-md-12').context(row) as col:
 
-                    col <= html.H1('Stylophone Assistant', Class='page-title')
-                    col <= html.SPAN(header_text, Class='page-header')
+                    col <= html.SPAN(header_text, Class='sa-paragraph')
                     col <= html.HR()
 
                 with html.DIV(Class='col-md-4').context(row) as col:
                     with html(
                         sl.select(
-                            pill=True,
+                            #pill=True,
                             label="Stylophone",
                             value="x1",
                             style="margin-top: 15px;",
@@ -282,11 +364,11 @@ class StylophoneAssistant(RadiantCore):
                         self.select_gen <= sl.option("Gen X-1", value='x1')
                         self.select_gen <= sl.option("Both", value='both')
                         self.select_gen.bind("wa-change", self.load_stylophone)
-                    
+
                 with html.DIV(Class='col-md-4').context(row) as col:
                     with html(
                         sl.select(
-                            pill=True,
+                            #pill=True,
                             label="Style",
                             value="tabs",
                             style="margin-top: 15px;",
@@ -302,7 +384,7 @@ class StylophoneAssistant(RadiantCore):
                 with html.DIV(Class='col-md-4').context(row) as col:
                     with html(
                         sl.select(
-                            pill=True,
+                            #pill=True,
                             label="Load tabs",
                             value="custom",
                             style="margin-top: 15px;",
@@ -341,7 +423,8 @@ class StylophoneAssistant(RadiantCore):
                         max="+12",
                         step=1,
                         value="0",
-                        style="--track-active-offset: 50%; --thumb-shadow: none; --track-color-active: var(--wa-color-primary-600);  --track-color-inactive: var(--wa-color-primary-100); margin-top: 20px;",
+                        #style="--track-active-offset: 50%; --thumb-shadow: none; --track-color-active: var(--wa-color-primary-600);  --track-color-inactive: var(--wa-color-primary-100); margin-top: 20px;",
+                        style="--track-active-offset: 50%; margin-top: 20px;",
                     )
                     col <= self.range_transpose
                     self.range_transpose.bind("wa-input", self.update_transposed_tabs)
@@ -428,38 +511,25 @@ class StylophoneAssistant(RadiantCore):
                     )
                     col <= self.span_tabs_post
 
-            with html.DIV(Class='row', style='margin-top: 30px;').context(
+            with html.DIV(Class='row sa-player', style='margin-top: 30px;').context(
                 container
             ) as row:
 
                 with html.DIV(
-                    Class='col-4 col-sm-6 icon-button-color', style="display: flex;"
+                    Class='col-1 sa-icon-button', style="display: flex;"
                 ).context(row) as col:
 
                     with html(
-                        sl.icon_button(name="play-circle", style="font-size: 3rem;")
+                        sl.icon_button(name="play", style="font-size: 3rem;")
                     ).context(col) as self.button_start:
                         self.button_start.bind("click", self.start_animation)
 
                     with html(
-                        sl.icon_button(name="stop-circle", style="font-size: 3rem;")
+                        sl.icon_button(name="stop", style="font-size: 3rem; display: none")
                     ).context(col) as self.button_stop:
                         self.button_stop.bind("click", self.stop_animation)
-                        self.button_stop.attrs['disabled'] = True
 
-                with html.DIV(Class='col-8 col-sm-6', style="margin-top: 4px;").context(
-                    row
-                ) as col:
-                    with html(sl.select(pill=True, value="500")).context(
-                        col
-                    ) as self.select_delay:
-                        for i in range(100, 5001, 100):
-                            self.select_delay <= sl.option(
-                                f"Delay: {i / 1000 :.1f} s", value=f"{i}"
-                            )
-                        self.select_delay.bind("wa-change", self.load_stylophone)
-
-                with html.DIV(Class='col-12', style="margin-top: 14px;").context(
+                with html.DIV(Class='col-9 sa-range-tabs').context(
                     row
                 ) as col:
 
@@ -469,7 +539,7 @@ class StylophoneAssistant(RadiantCore):
                             max="100",
                             step=1,
                             value="0",
-                            style="  --track-color-active: var(--wa-color-primary-600); --thumb-shadow: none;  --track-color-inactive: var(--wa-color-primary-100);margin-top: 20px;",
+                            #style="  --track-color-active: var(--wa-color-primary-600); --thumb-shadow: none;  --track-color-inactive: var(--wa-color-primary-100);margin-top: 20px;",
                         )
                     ).context(col) as self.range_progress:
                         self.range_progress.tooltipFormatter = (
@@ -477,7 +547,48 @@ class StylophoneAssistant(RadiantCore):
                         )
                         self.range_progress.bind("wa-input", self.range_progress_change)
 
+
+                #with html.DIV(Class='col-1', style="margin-top: 4px;").context(
+                    #row
+                #) as col:
+                    #self.select_delay = sl.input(type='number', value=500, help_text='animation delay.')
+                    #col <= self.select_delay
+                    #self.select_delay.bind("wa-change", self.load_stylophone)
+
+                with html.DIV(Class='col-2 sa-gap', style="margin-top: 4px;").context(
+                    row
+                ) as col:
+                    with html(sl.select(pill=True, value="500")).context(
+                        col
+                    ) as self.select_delay:
+                        for i in range(100, 3001, 100):
+                            self.select_delay <= sl.option(
+                                f"Gap: {i / 1000 :.1f} s", value=f"{i}"
+                            )
+                        self.select_delay.bind("wa-change", self.load_stylophone)
+
+
+
+        with html.DIV(Class='container-fluid sa-footer').context(self.body) as container:
+
+            container <= html.SPAN("""
+
+            Made with <wa-icon name="heart"></wa-icon> by <a href='https://dunderlab.com/'>DunderLab</a><br>
+            This site has been built using <a href='https://radiant-framework.readthedocs.io/en/latest/'>Radiant Framework</a> technology<br>
+            ©2024. Some rights reserved under the Creative Commons Attribution-ShareAlike 4.0 International License (CC BY-SA 4.0)
+
+            """)
+
+
         timer.set_timeout(self.initialize, 500)
+
+
+    # ----------------------------------------------------------------------
+    def auto_show(self, event):
+        """"""
+        tab = event.target.attrs['sa-tab-to-show']
+        select('.sa-tabs').styles.display = 'none'
+        select(f'.{tab}').styles.display = 'block'
 
     # ----------------------------------------------------------------------
     def initialize(self) -> None:
@@ -508,7 +619,7 @@ class StylophoneAssistant(RadiantCore):
         # Load the stylophone SVG and tabs
         self.load_stylophone(generation='x1', style='tabs', x1_octave_modifier='')
         self.load_tabs()
-        
+
         self.select_gen.attrs['value'] = 'x1'
 
     # ----------------------------------------------------------------------
@@ -721,8 +832,8 @@ class StylophoneAssistant(RadiantCore):
         self.stop = False
 
         # Disable the start button and enable the stop button
-        self.button_start.attrs['disabled'] = True
-        del self.button_stop.attrs['disabled']
+        self.button_start.style.display = 'none'
+        self.button_stop.style.display = 'block'
 
         # Set counters based on the current slider position
         self.counter_s1 = self.range_progress.value
@@ -763,8 +874,8 @@ class StylophoneAssistant(RadiantCore):
         self.stop = True
 
         # Disable the stop button and enable the start button
-        self.button_stop.attrs['disabled'] = True
-        del self.button_start.attrs['disabled']
+        self.button_stop.style.display = 'none'
+        self.button_start.style.display = 'block'
 
     # ----------------------------------------------------------------------
     def load_stylophone(
@@ -1132,8 +1243,9 @@ class StylophoneAssistant(RadiantCore):
         if not self.stop:
             timer.set_timeout(self.animate_x1, float(self.select_delay.value))
         else:
+            pass
             # Reset the progress bar when animation stops
-            self.range_progress.value = 0
+            #self.range_progress.value = 0
 
     # ----------------------------------------------------------------------
     def activate_transpose(self, event=None) -> None:

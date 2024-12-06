@@ -5,8 +5,8 @@
     <!--Shoelace-->
     <!--<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.18.0/cdn/themes/light.css" />-->
     <!--<script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.18.0/cdn/shoelace-autoloader.js"></script>-->
-        
-    
+
+
     <!--Web Awesome-->
     <script type="module" src="https://early.webawesome.com/webawesome@3.0.0-alpha.4/dist/webawesome.loader.js"></script>
     <link rel="stylesheet" href="https://early.webawesome.com/webawesome@3.0.0-alpha.4/dist/themes/default.css" />
@@ -24,19 +24,89 @@
 
     <style>
 
+      body {
+        font-family: "Roboto Condensed";
+        background-color: #F1F2ED;
+      }
+
+      .sa-header h1{
+        font-size: 2rem;
+        text-align: left;
+      }
+
+      .sa-header {
+         background-color: black;
+         color: white;
+         height: 80px;
+         padding: 0 30px;
+         margin-bottom: 30px;
+      }
+      wa-tab-group {
+      float: inline-end;
+       }
+
+      wa-tab-group wa-tab {
+        font-size: 1.5em;
+        font-weight: bold;
+        text-transform: uppercase;
+        padding-top: 12px;
+      }
+
+
+      .sa-paragraph {
+        font-size: 18px;
+        line-height: 23px;
+      }
+
+
+
+      :root {
+
+        --wa-focus-ring: var(--wa-focus-ring-style) var(--wa-focus-ring-width) #ccc;
+        --wa-form-control-resting-color: black;
+
+
+      }
+
+    wa-range {
+      --track-color-active: black;
+      --track-color-inactive: darkgray;
+      --thumb-color: black;
+    }
+
+    wa-switch {
+
+      --background-color-checked: black;
+      --border-color-checked: black;
+
+    }
+
+    wa-tab {
+      --active-tab-color: red;
+    }
+
+    wa-tab-group {
+      --indicator-color: black;
+      --track-color: black;
+      --track-width: 0;
+      --wa-color-neutral-on-quiet: white;
+    }
+
+    wa-option {
+
+    --background-color-current: black;
+    --label-color-current: white;
+    --background-color-hover: darkgray;
+    --label-color-hover: white;
+
+    }
 
 
     .button-group-toolbar wa-button-group:not(:last-of-type) {
       margin-right: var(--wa-spacing-x-small);
       }
 
-      .text-top {
-    text-align: center;
-      }
 
-    .page-header {
-      font-family: "Playfair Display", serif;
-    }
 
 
     wa-textarea::part(base) {
@@ -51,74 +121,59 @@
 
 
     hr {
-    margin: 29px 0;
-    border: 1px solid #977b69;
+    margin: 60px 0;
+    border: 0px;
+    border-bottom: 3px solid black;
     }
-
-
-
-      body {
-        background-color: #EBDAC6;
-        color: #56321F;
-        font-family: 'Cinzel', serif;
-        padding-bottom:30px;
-      }
-
-
-
-      :root {
-
-        --wa-form-control-background-color: #F4EED8;
-        --wa-form-control-resting-color: #56321F;
-        --wa-form-control-value-color: #56321F;
-        
-        --wa-line-height-expanded: 1.5;
-        
-        --wa-color-brand-fill-loud: #56321F;
-        --wa-color-surface-raised: #f4eed8;
-        --wa-color-surface-border: #56321F;
-        
-        --wa-color-neutral-fill-normal: #f4e7b1;
-        
-        --wa-focus-ring: var(--wa-focus-ring-style) var(--wa-focus-ring-width) #56321F2b;
-        
-        
-
-        --wa-color-primary-100: #F4EED8;
-        --wa-color-primary-500: #ab7755;
-        --wa-color-primary-600: #56321F;
-
-
-
-
-      }
-
-      .icon-button-color wa-icon-button::part(base) {
-        color: #56321F;
-      }
-
-      .icon-button-color wa-icon-button::part(base):hover,
-      .icon-button-color wa-icon-button::part(base):focus {
-        color: #ab7755;
-      }
-
-      .icon-button-color wa-icon-button::part(base):active {
-        color: #977b69;
-      }
 
 
     .tabs-line {
       font-family: monospace;
-      <!--text-wrap-mode: nowrap;-->
-      white-space: pre;
+    }
+
+    .sa-player {
+        border: 1px solid black;
+        border-radius: 100px;
+        background-color: white;
     }
 
 
-    ::selection {
-      background-color: #FFD700 !important;
-      color: #000 !important;
+    wa-icon-button  {
+        border-radius: 100px;
+        color: black;
+        padding-left: 16px;
     }
 
+
+  .sa-range-tabs {
+    border-radius: 100px;
+    padding: 22px;
+    padding-left: 30px !important;
+    padding-right: 30px !important;
+  }
+
+  .sa-gap {
+      padding-top: 8px;
+  }
+
+  .sa-footer {
+    background-color: black;
+    color: white;
+    text-align: center;
+    padding: 60px;
+    margin-top: 120px;
+    font-weight: lighter;
+  }
+
+  .sa-footer a {
+    color: red;
+    text-decoration: none;
+  }
+
+  .sa-tab-link {
+    color: white;
+    text-decoration: none;
+  }
 
 
     </style>

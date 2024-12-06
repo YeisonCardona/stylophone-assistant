@@ -95,6 +95,9 @@ class select(list):
         if attr == 'classes':
             return self.classes_()
 
+        if attr == 'bind':
+            return self.bind_()
+
         def inset(*args, **kwargs):
             return [getattr(element, attr)(*args, **kwargs) for element in self]
 
@@ -146,6 +149,17 @@ class select(list):
                 [setattr(element.styles, attr, value) for element in self]
 
         return Styles_()
+
+    # ----------------------------------------------------------------------
+    def bind_(self):
+        """"""
+        class Bind_:
+            def __call__(cls, event, fn):
+                """"""
+                return [element.bind(event, fn) for element in self]
+
+        return Bind_()
+
 
     # ----------------------------------------------------------------------
     def __le__(self, other):
