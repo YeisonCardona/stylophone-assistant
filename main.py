@@ -65,7 +65,7 @@ tunning_text = f"""
 
     <figure>
         <img src="{domain}/root/assets/stylophone_both_tabs_tunning.svg" alt="Stylophone tuning diagram" style="max-width: 100%; height: auto;">
-        <figcaption>Diagram showing the tuning knob and tuning control positions on the Stylophone.</figcaption>
+        <figcaption>Diagram showing the recommended tuning frequencies and sub-octave configurations for the Stylophone.</figcaption>
     </figure>
 
     <h2>6. Verify the Entire Range</h2>
