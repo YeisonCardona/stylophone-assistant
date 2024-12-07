@@ -573,10 +573,14 @@ class StylophoneAssistant(RadiantCore):
 
 
         timer.set_timeout(self.initialize, 500)
-        if tab := window.location.href.split('#')[1]:
-            self.auto_show(tab=f'sa-tab-{tab}', panel=tab)
-        else:
-            self.auto_show(tab='sa-tab-assistant', panel='assistant')
+        try:
+            tab = window.location.href.split('#')[1]
+            if not tab:
+                tab = 'assistant'
+        except:
+            tab = 'assistant'
+
+        self.auto_show(tab=f'sa-tab-{tab}', panel=tab)
 
     # ----------------------------------------------------------------------
     def auto_show(self, event=None, tab=None, panel=None):
