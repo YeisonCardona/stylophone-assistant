@@ -582,6 +582,7 @@ class StylophoneAssistant(RadiantCore):
 
         self.auto_show(tab=f'sa-tab-{tab}', panel=tab)
 
+
     # ----------------------------------------------------------------------
     def auto_show(self, event=None, tab=None, panel=None):
         """"""
@@ -593,9 +594,9 @@ class StylophoneAssistant(RadiantCore):
         select(f'.{tab}').styles.display = 'block'
 
         if '#' in window.location.href:
-            window.location.href = f"{window.location.href.rstrip('/').split('#')[0]}#{panel}"
+            window.history.pushState(None, "", f"{window.location.href.rstrip('/').split('#')[0]}#{panel}")
         else:
-            window.location.href = f"{window.location.href.rstrip('/')}#"
+            window.history.pushState(None, "", f"{window.location.href.rstrip('/')}#")
 
     # ----------------------------------------------------------------------
     def initialize(self) -> None:
