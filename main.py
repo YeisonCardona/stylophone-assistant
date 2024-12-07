@@ -5,8 +5,9 @@ from browser import timer, window
 from radiant.framework import WebComponents
 from browser.local_storage import storage
 import re
+from typing import Optional, Any
 
-sl = WebComponents('wa')
+wa = WebComponents('wa')
 
 button_base = '#B3B3B3'
 button_active = '#000000'
@@ -336,10 +337,10 @@ class StylophoneAssistant(RadiantCore):
                         tab = window.location.href.split('#')[1]
                     except:
                         tab = 'assistant'
-                    with html(sl.tab_group(active=tab)).context(col) as toolbar:
-                        toolbar <= sl.tab('Assistant', Class='sa-auto-show', sa_tab_to_show="sa-tab-assistant", slot='nav', panel="assistant")
-                        toolbar <= sl.tab('Tunning', Class='sa-auto-show', sa_tab_to_show="sa-tab-tunning", slot='nav', panel="tunning")
-                        toolbar <= sl.tab(html.A('GitHub', Class='sa-tab-link', href='https://github.com/YeisonCardona/stylophone-assistant'), slot='nav')
+                    with html(wa.tab_group(active=tab)).context(col) as toolbar:
+                        toolbar <= wa.tab('Assistant', Class='sa-auto-show', sa_tab_to_show="sa-tab-assistant", slot='nav', panel="assistant")
+                        toolbar <= wa.tab('Tunning', Class='sa-auto-show', sa_tab_to_show="sa-tab-tunning", slot='nav', panel="tunning")
+                        toolbar <= wa.tab(html.A('GitHub', Class='sa-tab-link', href='https://github.com/YeisonCardona/stylophone-assistant'), slot='nav')
                         select('.sa-auto-show').bind('click', self.auto_show)
                     self.auto_show(tab=f'sa-tab-{tab}', panel=tab)
 
@@ -357,44 +358,41 @@ class StylophoneAssistant(RadiantCore):
 
                 with html.DIV(Class='col-md-4').context(row) as col:
                     with html(
-                        sl.select(
-                            #pill=True,
+                        wa.select(
                             label="Stylophone",
                             value="x1",
                             style="margin-top: 15px;",
                         )
                     ).context(col) as self.select_gen:
-                        self.select_gen <= sl.option("Gen S-1", value='s1')
-                        self.select_gen <= sl.option("Gen X-1", value='x1')
-                        self.select_gen <= sl.option("Both", value='both')
+                        self.select_gen <= wa.option("Gen S-1", value='s1')
+                        self.select_gen <= wa.option("Gen X-1", value='x1')
+                        self.select_gen <= wa.option("Both", value='both')
                         self.select_gen.bind("wa-change", self.load_stylophone)
 
                 with html.DIV(Class='col-md-4').context(row) as col:
                     with html(
-                        sl.select(
-                            #pill=True,
+                        wa.select(
                             label="Style",
                             value="tabs",
                             style="margin-top: 15px;",
                         )
                     ).context(col) as self.select_style:
-                        self.select_style <= sl.option("Tabs", value='tabs')
-                        self.select_style <= sl.option("Solfège", value='solfege')
-                        self.select_style <= sl.option("American", value='kids')
+                        self.select_style <= wa.option("Tabs", value='tabs')
+                        self.select_style <= wa.option("Solfège", value='solfege')
+                        self.select_style <= wa.option("American", value='kids')
                         self.select_style.bind("wa-change", self.load_stylophone)
 
             with html.DIV(Class='row').context(container) as row:
 
                 with html.DIV(Class='col-md-4').context(row) as col:
                     with html(
-                        sl.select(
-                            #pill=True,
+                        wa.select(
                             label="Load tabs",
                             value="custom",
                             style="margin-top: 15px;",
                         )
                     ).context(col) as self.select_tab:
-                        self.select_tab <= sl.option("Custom", value='custom')
+                        self.select_tab <= wa.option("Custom", value='custom')
                         self.select_tab.bind("wa-change", self.load_tab_in_textarea)
 
             with html.DIV(Class='row').context(container) as row:
@@ -403,7 +401,7 @@ class StylophoneAssistant(RadiantCore):
                     row
                 ) as col:
                     with html(
-                        sl.textarea(label="Tabs", resize="auto", spellcheck="false")
+                        wa.textarea(label="Tabs", resize="auto", spellcheck="false")
                     ).context(col) as self.textarea_s1:
                         self.textarea_s1.bind("wa-input", self.save_tabs)
 
@@ -414,7 +412,7 @@ class StylophoneAssistant(RadiantCore):
                 with html.DIV(Class='col-md-3', style='margin-top: 15px;').context(
                     row
                 ) as col:
-                    self.switch_transpose = sl.switch("Transpose Tabs (Chromatic)")
+                    self.switch_transpose = wa.switch("Transpose Tabs (Chromatic)")
                     col <= self.switch_transpose
                     self.switch_transpose.bind("wa-input", self.activate_transpose)
 
@@ -422,12 +420,11 @@ class StylophoneAssistant(RadiantCore):
                     row
                 ) as col:
 
-                    self.range_transpose = sl.range(
+                    self.range_transpose = wa.range(
                         min="-12",
                         max="+12",
                         step=1,
                         value="0",
-                        #style="--track-active-offset: 50%; --thumb-shadow: none; --track-color-active: var(--wa-color-primary-600);  --track-color-inactive: var(--wa-color-primary-100); margin-top: 20px;",
                         style="--track-active-offset: 50%; margin-top: 20px;",
                     )
                     col <= self.range_transpose
@@ -442,7 +439,7 @@ class StylophoneAssistant(RadiantCore):
                 ) as col:
 
                     with html(
-                        sl.textarea(
+                        wa.textarea(
                             label="Transposed Tabs",
                             resize="auto",
                             spellcheck="false",
@@ -451,7 +448,7 @@ class StylophoneAssistant(RadiantCore):
                         self.textarea_transpose.bind("wa-input", self.save_tabs)
                         self.textarea_transpose.style.display = 'none'
 
-                    self.switch_transpose_model = sl.switch(
+                    self.switch_transpose_model = wa.switch(
                         "Transpose for X-1", checked=True, style='margin-top: 10px;'
                     )
                     col <= self.switch_transpose_model
@@ -467,7 +464,7 @@ class StylophoneAssistant(RadiantCore):
                 with html.DIV(Class='col-md-12', style='margin-top: 15px;').context(
                     row
                 ) as col:
-                    self.switch_x1_8va = sl.switch("Gen X-1 -1 Octave")
+                    self.switch_x1_8va = wa.switch("Gen X-1 -1 Octave")
                     col <= self.switch_x1_8va
                     self.switch_x1_8va.bind("wa-input", self.load_stylophone)
 
@@ -524,12 +521,12 @@ class StylophoneAssistant(RadiantCore):
                 ).context(row) as col:
 
                     with html(
-                        sl.icon_button(name="play", style="font-size: 3rem;")
+                        wa.icon_button(name="play", style="font-size: 3rem;")
                     ).context(col) as self.button_start:
                         self.button_start.bind("click", self.start_animation)
 
                     with html(
-                        sl.icon_button(name="stop", style="font-size: 3rem; display: none")
+                        wa.icon_button(name="stop", style="font-size: 3rem; display: none")
                     ).context(col) as self.button_stop:
                         self.button_stop.bind("click", self.stop_animation)
 
@@ -538,12 +535,11 @@ class StylophoneAssistant(RadiantCore):
                 ) as col:
 
                     with html(
-                        sl.range(
+                        wa.range(
                             min="0",
                             max="100",
                             step=1,
                             value="0",
-                            #style="  --track-color-active: var(--wa-color-primary-600); --thumb-shadow: none;  --track-color-inactive: var(--wa-color-primary-100);margin-top: 20px;",
                         )
                     ).context(col) as self.range_progress:
                         self.range_progress.tooltipFormatter = (
@@ -554,11 +550,11 @@ class StylophoneAssistant(RadiantCore):
                 with html.DIV(Class='col-6 col-sm-3 col-md-2 sa-gap', style="margin-top: 4px;").context(
                     row
                 ) as col:
-                    with html(sl.select(pill=True, value="500")).context(
+                    with html(wa.select(pill=True, value="500")).context(
                         col
                     ) as self.select_delay:
                         for i in range(100, 3001, 100):
-                            self.select_delay <= sl.option(
+                            self.select_delay <= wa.option(
                                 f"Gap: {i / 1000 :.1f} s", value=f"{i}"
                             )
                         self.select_delay.bind("wa-change", self.load_stylophone)
@@ -573,30 +569,52 @@ class StylophoneAssistant(RadiantCore):
 
 
         timer.set_timeout(self.initialize, 500)
-        try:
-            tab = window.location.href.split('#')[1]
-            if not tab:
-                tab = 'assistant'
-        except:
-            tab = 'assistant'
 
+        try:
+            tab = window.location.href.split('#', 1)[1] or 'assistant'
+        except IndexError:
+            tab = 'assistant'
         self.auto_show(tab=f'sa-tab-{tab}', panel=tab)
 
 
     # ----------------------------------------------------------------------
-    def auto_show(self, event=None, tab=None, panel=None):
-        """"""
+    def auto_show(self, event: Optional[Any] = None, tab: Optional[str] = None, panel: Optional[str] = None) -> None:
+        """
+        Handles tab and panel display in a web-based interface. Adjusts the URL hash
+        and updates the visibility of elements based on the provided or inferred
+        event.
+
+        Parameters
+        ----------
+        event : Optional[Any], optional
+            An event object, typically from an event handler. Used to infer the `tab`
+            and `panel` values if not explicitly provided. Defaults to None.
+        tab : Optional[str], optional
+            The CSS class name of the tab to show. If None, it will be inferred
+            from the `event`. Defaults to None.
+        panel : Optional[str], optional
+            The panel identifier for the URL hash. If None, it will be inferred
+            from the `event`. Defaults to None.
+
+        Returns
+        -------
+        None
+            This function does not return a value.
+        """
         if event:
+            # PSS: Extract `tab` and `panel` values from the event if provided.
             tab = event.target.attrs['sa-tab-to-show']
             panel = event.target.attrs['panel']
 
+        # Hide all tabs and display the selected one.
         select('.sa-tabs').styles.display = 'none'
         select(f'.{tab}').styles.display = 'block'
 
-        if '#' in window.location.href:
-            window.history.pushState(None, "", f"{window.location.href.rstrip('/').split('#')[0]}#{panel}")
-        else:
-            window.history.pushState(None, "", f"{window.location.href.rstrip('/')}#")
+        # Update the URL hash to reflect the current panel.
+        base_url = window.location.href.rstrip('/').split('#', 1)[0]
+        new_url = f"{base_url}#{panel}" if panel else f"{base_url}#"
+        window.history.pushState(None, "", new_url)
+
 
     # ----------------------------------------------------------------------
     def initialize(self) -> None:
@@ -1031,7 +1049,7 @@ class StylophoneAssistant(RadiantCore):
 
             # Create and populate dropdown options
             for i, tab in enumerate(tabs):
-                option = sl.option(
+                option = wa.option(
                     tab.replace('.txt', ''),  # Remove the file extension for display
                     value=f'tab-{i}',  # Unique value for each option
                     id=f'id-tab-{i}',  # Unique ID for each option
