@@ -5,20 +5,20 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Stylophone Assistant</title>
-<link rel="icon" type="image/x-icon" href="">
-<meta name="description" content="">
+<link rel="icon" type="image/x-icon" href="/stylophone-assistant/root/static/icons/favicon.ico">
+<meta name="description" content="Stylophone Assistant: Create custom tabs, generate dynamic animations, and practice seamlessly with your Stylophone S-1 or Gen X-1. Perfect for all skill levels!">
 <meta name="robots" content="index, follow">
 <meta property="og:title" content="Stylophone Assistant">
-<meta property="og:description" content="">
+<meta property="og:description" content="Stylophone Assistant: Create custom tabs, generate dynamic animations, and practice seamlessly with your Stylophone S-1 or Gen X-1. Perfect for all skill levels!">
 <meta property="og:image" content="">
-<meta property="og:url" content="">
+<meta property="og:url" content="yeisoncardona.github.io/stylophone-assistant">
 <meta name="twitter:card" content="">
-<meta name="twitter:site" content="">
+<meta name="twitter:site" content="Stylophone Assistant">
 <meta name="twitter:title" content="Stylophone Assistant">
-<meta name="twitter:description" content="">
+<meta name="twitter:description" content="Stylophone Assistant: Create custom tabs, generate dynamic animations, and practice seamlessly with your Stylophone S-1 or Gen X-1. Perfect for all skill levels!">
 <meta name="twitter:image" content="">
-<link rel="canonical" href="">
-<meta name="author" content="">
+<link rel="canonical" href="yeisoncardona.github.io/stylophone-assistant">
+<meta name="author" content="Yeison Cardona">
 <meta name="copyright" content="">
 
 <!--Shoelace-->
@@ -32,14 +32,15 @@ await import("https://early.webawesome.com/webawesome@3.0.0-alpha.4/dist/compone
 await import("https://early.webawesome.com/webawesome@3.0.0-alpha.4/dist/components/select/select.js")
 </script>
 <!--Fonts-->
-<!--<link type="text/css" rel="stylesheet" href="/stylophone-assistant/root/static/fonts/segou_ui_4/segoe.css">-->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap" rel="stylesheet">
 <style>
 body {
 font-family: "Roboto Condensed";
 background-color: #F1F2ED;
+width: 100vw;
+overflow-x: hidden;
 }
 .sa-header h1{
 font-size: 2rem;
@@ -48,7 +49,7 @@ text-align: left;
 .sa-header {
 background-color: black;
 color: white;
-height: 80px;
+min-height: 80px;
 padding: 0 30px;
 margin-bottom: 30px;
 }
@@ -60,6 +61,11 @@ font-size: 1.5em;
 font-weight: bold;
 text-transform: uppercase;
 padding-top: 12px;
+}
+@media (max-width: 576px) {
+wa-tab-group wa-tab {
+font-size: 1em;
+}
 }
 .sa-paragraph {
 font-size: 18px;
@@ -146,6 +152,16 @@ text-decoration: none;
 .sa-tab-link {
 color: white;
 text-decoration: none;
+}
+@media (max-width: 576px) {
+.sa-range-tabs {
+padding-left: 20px !important;
+padding-right: unset !important;
+}
+wa-icon-button {
+font-size: 2rem !important;
+margin-top: 8px;
+}
 }
 </style>
 

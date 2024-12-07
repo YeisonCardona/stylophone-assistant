@@ -1,7 +1,7 @@
 from radiant.framework.server import RadiantCore, RadiantServer
 from radiant.framework import html, Element, select
 from browser import document, svg, ajax
-from browser import timer
+from browser import timer, window
 from radiant.framework import WebComponents
 from browser.local_storage import storage
 import re
@@ -326,18 +326,22 @@ class StylophoneAssistant(RadiantCore):
         self.loaded = False
 
         with html.DIV(Class='container-fluid').context(self.body) as container:
-            with html.DIV(Class='row  sa-header').context(container) as header:
-                with html.DIV(Class='col-md-4').context(header) as col:
+            with html.DIV(Class='row sa-header').context(container) as header:
+
+                with html.DIV(Class='col-sm-12').context(header) as col:
                     col <= html.H1('STYLOPHONE ASSISTANT', Class='header-title')
 
-                with html.DIV(Class='col-md-8 sa-toolbar').context(header) as col:
-
-                    with html(sl.tab_group()).context(col) as toolbar:
-
+                with html.DIV(Class='col-sm-12 sa-toolbar').context(header) as col:
+                    try:
+                        tab = window.location.href.split('#')[1]
+                    except:
+                        tab = 'assistant'
+                    with html(sl.tab_group(active=tab)).context(col) as toolbar:
                         toolbar <= sl.tab('Assistant', Class='sa-auto-show', sa_tab_to_show="sa-tab-assistant", slot='nav', panel="assistant")
                         toolbar <= sl.tab('Tunning', Class='sa-auto-show', sa_tab_to_show="sa-tab-tunning", slot='nav', panel="tunning")
                         toolbar <= sl.tab(html.A('GitHub', Class='sa-tab-link', href='https://github.com/YeisonCardona/stylophone-assistant'), slot='nav')
                         select('.sa-auto-show').bind('click', self.auto_show)
+                    self.auto_show(tab=f'sa-tab-{tab}', panel=tab)
 
         with html.DIV(Class='container sa-tabs sa-tab-tunning', style='display: none;').context(self.body) as container:
             container <= html.SPAN(tunning_text, Class='sa-paragraph')
@@ -516,7 +520,7 @@ class StylophoneAssistant(RadiantCore):
             ) as row:
 
                 with html.DIV(
-                    Class='col-1 sa-icon-button', style="display: flex;"
+                    Class='col-2 col-sm-2 col-md-1 sa-icon-button', style="display: flex;"
                 ).context(row) as col:
 
                     with html(
@@ -529,7 +533,7 @@ class StylophoneAssistant(RadiantCore):
                     ).context(col) as self.button_stop:
                         self.button_stop.bind("click", self.stop_animation)
 
-                with html.DIV(Class='col-9 sa-range-tabs').context(
+                with html.DIV(Class='col-4 col-sm-7 col-md-9 sa-range-tabs').context(
                     row
                 ) as col:
 
@@ -547,15 +551,7 @@ class StylophoneAssistant(RadiantCore):
                         )
                         self.range_progress.bind("wa-input", self.range_progress_change)
 
-
-                #with html.DIV(Class='col-1', style="margin-top: 4px;").context(
-                    #row
-                #) as col:
-                    #self.select_delay = sl.input(type='number', value=500, help_text='animation delay.')
-                    #col <= self.select_delay
-                    #self.select_delay.bind("wa-change", self.load_stylophone)
-
-                with html.DIV(Class='col-2 sa-gap', style="margin-top: 4px;").context(
+                with html.DIV(Class='col-6 col-sm-3 col-md-2 sa-gap', style="margin-top: 4px;").context(
                     row
                 ) as col:
                     with html(sl.select(pill=True, value="500")).context(
@@ -568,27 +564,34 @@ class StylophoneAssistant(RadiantCore):
                         self.select_delay.bind("wa-change", self.load_stylophone)
 
 
-
         with html.DIV(Class='container-fluid sa-footer').context(self.body) as container:
-
             container <= html.SPAN("""
-
             Made with <wa-icon name="heart"></wa-icon> by <a href='https://dunderlab.com/'>DunderLab</a><br>
             This site has been built using <a href='https://radiant-framework.readthedocs.io/en/latest/'>Radiant Framework</a> technology<br>
             ©2024. Some rights reserved under the Creative Commons Attribution-ShareAlike 4.0 International License (CC BY-SA 4.0)
-
             """)
 
 
         timer.set_timeout(self.initialize, 500)
-
+        if tab := window.location.href.split('#')[1]:
+            self.auto_show(tab=f'sa-tab-{tab}', panel=tab)
+        else:
+            self.auto_show(tab='sa-tab-assistant', panel='assistant')
 
     # ----------------------------------------------------------------------
-    def auto_show(self, event):
+    def auto_show(self, event=None, tab=None, panel=None):
         """"""
-        tab = event.target.attrs['sa-tab-to-show']
+        if event:
+            tab = event.target.attrs['sa-tab-to-show']
+            panel = event.target.attrs['panel']
+
         select('.sa-tabs').styles.display = 'none'
         select(f'.{tab}').styles.display = 'block'
+
+        if '#' in window.location.href:
+            window.location.href = f"{window.location.href.rstrip('/').split('#')[0]}#{panel}"
+        else:
+            window.location.href = f"{window.location.href.rstrip('/')}#"
 
     # ----------------------------------------------------------------------
     def initialize(self) -> None:
@@ -621,6 +624,7 @@ class StylophoneAssistant(RadiantCore):
         self.load_tabs()
 
         self.select_gen.attrs['value'] = 'x1'
+
 
     # ----------------------------------------------------------------------
     @property
@@ -718,7 +722,13 @@ class StylophoneAssistant(RadiantCore):
 
         # Adjust the progress bar range
         self.range_progress.min = 0
-        self.range_progress.max = len(self.normalized_tabs.split(' ')) - 1
+
+        max_ = len(self.normalized_tabs.split(' ')) - 1
+
+        if max_ > 0:
+            self.range_progress.max = max_
+        else:
+            self.range_progress.max = 100
 
         # Debug information
         print("Input tabs:", self.textarea_s1.value)
@@ -966,11 +976,11 @@ class StylophoneAssistant(RadiantCore):
             except Exception:
                 pass
 
-            if self.switch_x1_8va.checked:
-                try:
-                    document["tab_xm1"].style.fill = button_active
-                except Exception:
-                    pass
+            #if self.switch_x1_8va.checked:
+            try:
+                document["tab_xm1"].style.fill = button_active
+            except Exception:
+                pass
 
             # Save tabs after successful SVG load
             self.save_tabs()
@@ -1348,7 +1358,6 @@ class StylophoneAssistant(RadiantCore):
         # Update the textarea with the cleaned transposed tabs
         self.textarea_transpose.value = '\n'.join(tabs_clear).strip('\n')
 
-
 if __name__ == '__main__':
     load_tabs()
 
@@ -1356,7 +1365,16 @@ if __name__ == '__main__':
         'StylophoneAssistant',
         host='0.0.0.0',
         template='template.html',
-        page_title="Stylophone Assistant",
         static_app='docs',
         domain=domain,
+
+        page_title="Stylophone Assistant",
+        page_favicon=f"{domain}/root/static/icons/favicon.ico",
+        page_description="Stylophone Assistant: Create custom tabs, generate dynamic animations, and practice seamlessly with your Stylophone S-1 or Gen X-1. Perfect for all skill levels!",
+        #page_image="",
+        page_url="yeisoncardona.github.io/stylophone-assistant",
+        #page_summary_large_image="",
+        page_site="Stylophone Assistant",
+        page_author="Yeison Cardona",
+        #page_copyright="",
     )
